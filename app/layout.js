@@ -24,21 +24,21 @@ export default function RootLayout({ children }) {
         <nav className="bg-white shadow-md sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
-              <div className="text-xl font-bold text-gray-800">
+              <a href="/" className="text-xl font-bold text-gray-800 hover:text-indigo-600 transition-colors">
                 🧮 Free Calculators
-              </div>
+              </a>
               <div className="flex gap-6">
                 <a 
-                  href="/" 
+                  href="/bmi-calculator" 
                   className="text-gray-700 hover:text-indigo-600 font-medium transition-colors"
                 >
-                  BMI Calculator
+                  💪 BMI
                 </a>
                 <a 
                   href="/age-calculator" 
                   className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
                 >
-                  Age Calculator
+                  🎂 Age
                 </a>
               </div>
             </div>
