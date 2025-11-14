@@ -34,6 +34,12 @@ export default function Home() {
     }
   };
 
+  const resetCalculator = () => {
+    setWeight('');
+    setHeight('');
+    setResult(null);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
       <div className="max-w-2xl mx-auto">
@@ -85,7 +91,12 @@ export default function Home() {
             >
               Calculate BMI
             </button>
-
+            <button
+              onClick={resetCalculator}
+              className="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-4 px-6 rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl"
+            >
+              Reset
+            </button>
             {/* Result Display */}
             {result && (
               <div className="mt-6 p-6 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl border-2 border-indigo-200">
