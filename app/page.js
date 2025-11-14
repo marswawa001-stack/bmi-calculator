@@ -1,65 +1,151 @@
-import Image from "next/image";
+'use client';
+
+import { useState } from 'react';
 
 export default function Home() {
+  const [weight, setWeight] = useState('');
+  const [height, setHeight] = useState('');
+  const [result, setResult] = useState(null);
+
+  const calculateBMI = () => {
+    const w = parseFloat(weight);
+    const h = parseFloat(height) / 100;
+    
+    if (w && h) {
+      const bmi = (w / (h * h)).toFixed(1);
+      let category = '';
+      let color = '';
+      
+      if (bmi < 18.5) {
+        category = 'Underweight';
+        color = 'text-blue-600';
+      } else if (bmi < 24.9) {
+        category = 'Normal weight';
+        color = 'text-green-600';
+      } else if (bmi < 29.9) {
+        category = 'Overweight';
+        color = 'text-yellow-600';
+      } else {
+        category = 'Obese';
+        color = 'text-red-600';
+      }
+      
+      setResult({ bmi, category, color });
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.js file.
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
+      <div className="max-w-2xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">
+            BMI Calculator
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-gray-600">
+            Calculate your Body Mass Index quickly and easily
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Calculator Card */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
+          <div className="space-y-6">
+            {/* Weight Input */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Weight (kg)
+              </label>
+              <input
+                type="number"
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+                placeholder="e.g., 70"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-indigo-500 focus:outline-none transition-colors text-lg text-gray-900"
+              />
+            </div>
+
+            {/* Height Input */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Height (cm)
+              </label>
+              <input
+                type="number"
+                value={height}
+                onChange={(e) => setHeight(e.target.value)}
+                placeholder="e.g., 170"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-indigo-500 focus:outline-none transition-colors text-lg text-gray-900"
+              />
+            </div>
+
+            {/* Calculate Button */}
+            <button
+              onClick={calculateBMI}
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-6 rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl"
+            >
+              Calculate BMI
+            </button>
+
+            {/* Result Display */}
+            {result && (
+              <div className="mt-6 p-6 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl border-2 border-indigo-200">
+                <div className="text-center">
+                  <p className="text-gray-600 text-sm mb-2">Your BMI</p>
+                  <p className="text-5xl font-bold text-gray-800 mb-3">
+                    {result.bmi}
+                  </p>
+                  <p className={`text-xl font-semibold ${result.color}`}>
+                    {result.category}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-      </main>
+
+        {/* Info Section */}
+        <div className="bg-white rounded-2xl shadow-lg p-8">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">
+            Understanding BMI
+          </h2>
+          
+          <div className="space-y-4 text-gray-700">
+            <div className="flex items-start">
+              <div className="w-3 h-3 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+              <div>
+                <strong>Underweight:</strong> BMI less than 18.5
+              </div>
+            </div>
+            
+            <div className="flex items-start">
+              <div className="w-3 h-3 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+              <div>
+                <strong>Normal weight:</strong> BMI 18.5 to 24.9
+              </div>
+            </div>
+            
+            <div className="flex items-start">
+              <div className="w-3 h-3 bg-yellow-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+              <div>
+                <strong>Overweight:</strong> BMI 25 to 29.9
+              </div>
+            </div>
+            
+            <div className="flex items-start">
+              <div className="w-3 h-3 bg-red-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+              <div>
+                <strong>Obese:</strong> BMI 30 or greater
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">
+            <p className="text-sm text-gray-700">
+              <strong>Note:</strong> BMI is a screening tool and does not diagnose body fatness or health. Consult with a healthcare provider for personalized advice.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
