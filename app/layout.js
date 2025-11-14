@@ -19,9 +19,33 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className="antialiased">
+        {/* 导航栏 */}
+        <nav className="bg-white shadow-md sticky top-0 z-50">
+          <div className="max-w-7xl mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="text-xl font-bold text-gray-800">
+                🧮 Free Calculators
+              </div>
+              <div className="flex gap-6">
+                <a 
+                  href="/" 
+                  className="text-gray-700 hover:text-indigo-600 font-medium transition-colors"
+                >
+                  BMI Calculator
+                </a>
+                <a 
+                  href="/age-calculator" 
+                  className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
+                >
+                  Age Calculator
+                </a>
+              </div>
+            </div>
+          </div>
+        </nav>
+        
+        {/* 页面内容 */}
         {children}
       </body>
     </html>
