@@ -193,20 +193,52 @@ export default function BMICalculatorContent() {
               {/* BMI Range Visualization */}
               <div className="mt-6 pt-6 border-t border-gray-300">
                 <p className="text-sm font-semibold text-gray-700 mb-3">BMI Range Chart</p>
-                <div className="flex gap-1 h-8 rounded-lg overflow-hidden shadow">
-                  {getBMIRangeInfo().map((range, idx) => (
-                    <div
-                      key={idx}
-                      className={`flex-1 ${range.color} flex items-center justify-center text-xs font-bold ${range.textColor}`}
-                      title={`${range.label}: ${range.min}-${range.max}`}
-                    >
-                      {range.label}
-                    </div>
-                  ))}
+                
+                {/* Range Bar with Arrow Indicator */}
+                <div className="relative mb-8">
+                  {/* BMI Range Bar */}
+                  <div className="flex gap-1 h-8 rounded-lg overflow-hidden shadow">
+                    {getBMIRangeInfo().map((range, idx) => (
+                      <div
+                        key={idx}
+                        className={`flex-1 ${range.color} flex items-center justify-center text-xs font-bold ${range.textColor}`}
+                        title={`${range.label}: ${range.min}-${range.max}`}
+                      >
+                        {range.label}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Arrow Indicator */}
+                  {result.bmi && (
+                    (() => {
+                      // Calculate position: BMI goes from 0 to 60
+                      const maxBMI = 60;
+                      const position = Math.min((parseFloat(result.bmi) / maxBMI) * 100, 100);
+                      
+                      return (
+                        <div
+                          className="absolute top-10 flex flex-col items-center transition-all duration-300"
+                          style={{ left: `${position}%`, transform: 'translateX(-50%)' }}
+                        >
+                          {/* Arrow */}
+                          <div className="text-2xl drop-shadow-lg">👇</div>
+                          {/* Value Label */}
+                          <div className="mt-1 bg-gray-800 text-white text-xs font-bold px-2 py-1 rounded whitespace-nowrap drop-shadow-lg">
+                            {result.bmi}
+                          </div>
+                        </div>
+                      );
+                    })()
+                  )}
                 </div>
-                <div className="flex justify-between mt-2 text-xs text-gray-500">
+
+                {/* Scale Labels */}
+                <div className="flex justify-between text-xs text-gray-500 font-medium">
                   <span>0</span>
-                  <span>Your BMI: {result.bmi}</span>
+                  <span>18.5</span>
+                  <span>25</span>
+                  <span>30</span>
                   <span>60+</span>
                 </div>
               </div>
