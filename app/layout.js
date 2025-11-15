@@ -1,4 +1,6 @@
 import Script from 'next/script';
+import Navigation from './components/Navigation';
+import Footer from './components/Footer';
 import './globals.css';  // 👈 关键！引入 CSS
 
 export const metadata = {
@@ -20,32 +22,13 @@ export default function RootLayout({ children }) {
       </head>
       <body className="antialiased">
         {/* 导航栏 */}
-        <nav className="bg-white shadow-md sticky top-0 z-50">
-          <div className="max-w-7xl mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <a href="/" className="text-xl font-bold text-gray-800 hover:text-indigo-600 transition-colors">
-                🧮 Free Calculators
-              </a>
-              <div className="flex gap-6">
-                <a 
-                  href="/bmi-calculator" 
-                  className="text-gray-700 hover:text-indigo-600 font-medium transition-colors"
-                >
-                  💪 BMI
-                </a>
-                <a 
-                  href="/age-calculator" 
-                  className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
-                >
-                  🎂 Age
-                </a>
-              </div>
-            </div>
-          </div>
-        </nav>
+        <Navigation />
         
         {/* 页面内容 */}
         {children}
+
+        {/* 页脚 */}
+        <Footer />
       </body>
     </html>
   );
