@@ -8,6 +8,8 @@ export default function BMICalculatorContent() {
   const [result, setResult] = useState(null);
   const [unit, setUnit] = useState('metric');
   const [history, setHistory] = useState([]);
+  const [weightError, setWeightError] = useState('');
+  const [heightError, setHeightError] = useState('');
 
   useEffect(() => {
     const saved = localStorage.getItem('bmi_history');
@@ -23,6 +25,26 @@ export default function BMICalculatorContent() {
     const weightKg = w * 0.453592;
     const heightCm = h * 30.48;
     return { weight: weightKg, height: heightCm };
+  };
+
+  // 验证输入值是否有效
+  const validateInput = (val) => {
+    if (val === '') return { valid: false, error: '' };
+    if (!/^(\d+\.?\d*|\.\d+)$/.test(val)) {
+      return { valid: false, error: 'Please enter only positive numbers' };
+    }
+    if (parseFloat(val) <= 0) {
+      return { valid: false, error: 'Must be greater than 0' };
+    }
+    return { valid: true, error: '' };
+  };
+
+  // 检查是否可以计算
+  const isCalculateEnabled = () => {
+    if (weight === '' || height === '') return false;
+    const weightValidation = validateInput(weight);
+    const heightValidation = validateInput(height);
+    return weightValidation.valid && heightValidation.valid;
   };
 
   const calculateBMI = () => {
@@ -71,6 +93,8 @@ export default function BMICalculatorContent() {
     setWeight('');
     setHeight('');
     setResult(null);
+    setWeightError('');
+    setHeightError('');
   };
 
   const switchUnit = (newUnit) => {
@@ -129,13 +153,27 @@ export default function BMICalculatorContent() {
               Weight ({unit === 'metric' ? 'kg' : 'lb'})
             </label>
             <input
-              type="number"
+              type="text"
               value={weight}
-              onChange={(e) => setWeight(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && calculateBMI()}
+              onChange={(e) => {
+                const val = e.target.value;
+                setWeight(val);
+                
+                if (val === '') {
+                  setWeightError('');
+                } else {
+                  const validation = validateInput(val);
+                  setWeightError(validation.error);
+                }
+              }}
+              onKeyPress={(e) => e.key === 'Enter' && isCalculateEnabled() && calculateBMI()}
               placeholder={unit === 'metric' ? 'e.g., 70' : 'e.g., 154'}
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-indigo-500 focus:outline-none transition-colors text-lg text-gray-900"
+              className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors text-lg text-gray-900 ${
+                weightError ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-indigo-500'
+              }`}
             />
+            {weightError && <p className="text-xs text-red-600 mt-1">⚠️ {weightError}</p>}
+            <p className="text-xs text-gray-500 mt-1">Valid range: 0.1 - {unit === 'metric' ? '500 kg' : '1100 lb'}</p>
           </div>
 
           {/* Height Input */}
@@ -144,20 +182,39 @@ export default function BMICalculatorContent() {
               Height ({unit === 'metric' ? 'cm' : 'ft'})
             </label>
             <input
-              type="number"
+              type="text"
               value={height}
-              onChange={(e) => setHeight(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && calculateBMI()}
+              onChange={(e) => {
+                const val = e.target.value;
+                setHeight(val);
+                
+                if (val === '') {
+                  setHeightError('');
+                } else {
+                  const validation = validateInput(val);
+                  setHeightError(validation.error);
+                }
+              }}
+              onKeyPress={(e) => e.key === 'Enter' && isCalculateEnabled() && calculateBMI()}
               placeholder={unit === 'metric' ? 'e.g., 170' : 'e.g., 5.58'}
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-indigo-500 focus:outline-none transition-colors text-lg text-gray-900"
+              className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors text-lg text-gray-900 ${
+                heightError ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-indigo-500'
+              }`}
             />
+            {heightError && <p className="text-xs text-red-600 mt-1">⚠️ {heightError}</p>}
+            <p className="text-xs text-gray-500 mt-1">Valid range: 0.1 - {unit === 'metric' ? '300 cm' : '9.84 ft'}</p>
           </div>
 
           {/* Buttons */}
           <div className="flex gap-4">
             <button
               onClick={calculateBMI}
-              className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-6 rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl"
+              disabled={!isCalculateEnabled()}
+              className={`flex-1 font-bold py-4 px-6 rounded-lg transition-colors duration-200 shadow-lg ${
+                isCalculateEnabled()
+                  ? 'bg-indigo-600 hover:bg-indigo-700 text-white hover:shadow-xl cursor-pointer'
+                  : 'bg-gray-400 text-gray-200 cursor-not-allowed opacity-60'
+              }`}
             >
               Calculate BMI
             </button>
