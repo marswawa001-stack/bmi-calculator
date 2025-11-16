@@ -88,19 +88,22 @@ export default function BMICalculatorContent() {
     
     if (weightMetric && hm) {
       const bmi = (weightMetric / (hm * hm)).toFixed(1);
+      const bmiValue = parseFloat(bmi);
       let category = '';
       let color = '';
       let advice = '';
-      
-      if (bmi < 18.5) {
+
+      if (bmiValue < 18.5) {
         category = 'Underweight';
         color = 'text-blue-600';
         advice = 'You may need to gain weight. Consult a healthcare provider for personalized advice.';
-      } else if (bmi < 24.9) {
+      } else if (bmiValue < 25) {
+        // Use <25 so that 24.9 is considered Normal (consistent with chart)
         category = 'Normal weight';
         color = 'text-green-600';
         advice = 'You have a healthy weight. Maintain it with regular exercise and balanced diet.';
-      } else if (bmi < 29.9) {
+      } else if (bmiValue < 30) {
+        // Use <30 so that 29.9 is Overweight and 30+ is Obese
         category = 'Overweight';
         color = 'text-yellow-600';
         advice = 'Consider increasing physical activity and adjusting your diet.';

@@ -159,7 +159,7 @@ export default function Footer() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Omni</h3>
+              <h3 className="text-xl font-bold text-white mb-2">Hownav</h3>
               <p className="text-gray-400 text-sm">
                 All-in-one calculator for everyday calculations.
               </p>
@@ -263,7 +263,7 @@ export default function Footer() {
       {/* 底部栏 */}
       <div className="max-w-7xl mx-auto px-4 py-6 border-t border-gray-800">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500">
-          <p>&copy; 2024 Omni Calculator. All rights reserved.</p>
+          <p>&copy; 2024 Hownav Calculator. All rights reserved.</p>
           <div className="flex gap-6">
             <a href="#" className="hover:text-indigo-500 transition-colors">Terms</a>
             <a href="#" className="hover:text-indigo-500 transition-colors">Privacy</a>
