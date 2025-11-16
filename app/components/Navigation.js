@@ -131,7 +131,7 @@ export default function Navigation() {
                 <input
                   ref={searchInputRef}
                   type="text"
-                  placeholder="Search calculators..."
+                  placeholder=""
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={handleKeyDown}

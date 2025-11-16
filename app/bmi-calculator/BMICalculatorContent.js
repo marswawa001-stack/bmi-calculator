@@ -39,11 +39,41 @@ export default function BMICalculatorContent() {
     return { valid: true, error: '' };
   };
 
+  // 验证体重是否在有效范围内
+  const validateWeight = (val) => {
+    const validation = validateInput(val);
+    if (!validation.valid) return validation;
+    
+    const weightValue = parseFloat(val);
+    const isMetric = unit === 'metric';
+    const maxWeight = isMetric ? 500 : 1100; // kg or lb
+    
+    if (weightValue > maxWeight) {
+      return { valid: false, error: `Must be between 0.1 and ${maxWeight} ${isMetric ? 'kg' : 'lb'}` };
+    }
+    return { valid: true, error: '' };
+  };
+
+  // 验证身高是否在有效范围内
+  const validateHeight = (val) => {
+    const validation = validateInput(val);
+    if (!validation.valid) return validation;
+    
+    const heightValue = parseFloat(val);
+    const isMetric = unit === 'metric';
+    const maxHeight = isMetric ? 300 : 9.84; // cm or ft
+    
+    if (heightValue > maxHeight) {
+      return { valid: false, error: `Must be between 0.1 and ${maxHeight} ${isMetric ? 'cm' : 'ft'}` };
+    }
+    return { valid: true, error: '' };
+  };
+
   // 检查是否可以计算
   const isCalculateEnabled = () => {
     if (weight === '' || height === '') return false;
-    const weightValidation = validateInput(weight);
-    const heightValidation = validateInput(height);
+    const weightValidation = validateWeight(weight);
+    const heightValidation = validateHeight(height);
     return weightValidation.valid && heightValidation.valid;
   };
 
@@ -162,7 +192,7 @@ export default function BMICalculatorContent() {
                 if (val === '') {
                   setWeightError('');
                 } else {
-                  const validation = validateInput(val);
+                  const validation = validateWeight(val);
                   setWeightError(validation.error);
                 }
               }}
@@ -191,7 +221,7 @@ export default function BMICalculatorContent() {
                 if (val === '') {
                   setHeightError('');
                 } else {
-                  const validation = validateInput(val);
+                  const validation = validateHeight(val);
                   setHeightError(validation.error);
                 }
               }}
@@ -251,52 +281,96 @@ export default function BMICalculatorContent() {
               <div className="mt-6 pt-6 border-t border-gray-300">
                 <p className="text-sm font-semibold text-gray-700 mb-3">BMI Range Chart</p>
                 
-                {/* Range Bar with Arrow Indicator */}
-                <div className="relative mb-8">
+                {/* Scale Labels Above Bar */}
+                <div className="relative text-xs text-gray-500 font-medium mb-2 h-5">
+                  {[
+                    { value: 0, label: '0' },
+                    { value: 18.5, label: '18.5' },
+                    { value: 25, label: '25' },
+                    { value: 30, label: '30' },
+                    { value: 60, label: '60+' },
+                  ].map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="absolute transform -translate-x-1/2"
+                      style={{ left: `${(item.value / 60) * 100}%` }}
+                    >
+                      <span>{item.label}</span>
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Range Bar with Indicator Line */}
+                <div className="relative mb-12">
+                  {/* BMI Indicator Line */}
+                  {result.bmi && (
+                    (() => {
+                      // Calculate position based on actual range widths
+                      const ranges = getBMIRangeInfo();
+                      const totalWidth = ranges[ranges.length - 1].max; // 60
+                      const bmiValue = parseFloat(result.bmi);
+                      const position = Math.min((bmiValue / totalWidth) * 100, 100);
+                      
+                      // Determine color based on BMI category
+                      let indicatorColor = 'bg-gray-800';
+                      let glowColor = 'rgba(31, 41, 55, 0.3)'; // gray-800
+                      
+                      if (bmiValue < 18.5) {
+                        indicatorColor = 'bg-blue-600';
+                        glowColor = 'rgba(37, 99, 235, 0.5)';
+                      } else if (bmiValue < 25) {
+                        indicatorColor = 'bg-green-600';
+                        glowColor = 'rgba(22, 163, 74, 0.5)';
+                      } else if (bmiValue < 30) {
+                        indicatorColor = 'bg-yellow-600';
+                        glowColor = 'rgba(202, 138, 4, 0.5)';
+                      } else {
+                        indicatorColor = 'bg-red-600';
+                        glowColor = 'rgba(220, 38, 38, 0.5)';
+                      }
+                      
+                      return (
+                        <div
+                          className="absolute transition-all duration-300 z-10 group"
+                          style={{ left: `${position}%`, top: '0', transform: 'translateX(-50%)' }}
+                        >
+                          {/* Indicator Line with glow effect */}
+                          <div 
+                            className={`w-1.5 h-8 ${indicatorColor} drop-shadow-lg rounded-sm transition-all duration-200 group-hover:w-2 group-hover:shadow-lg cursor-pointer`}
+                            style={{ 
+                              boxShadow: `0 0 8px ${glowColor}, inset 0 0 4px rgba(255, 255, 255, 0.3)` 
+                            }}
+                          ></div>
+                        </div>
+                      );
+                    })()
+                  )}
+                  
                   {/* BMI Range Bar */}
-                  <div className="flex gap-1 h-8 rounded-lg overflow-hidden shadow">
+                  <div className="flex h-8 rounded-lg overflow-hidden shadow relative">
                     {getBMIRangeInfo().map((range, idx) => (
                       <div
                         key={idx}
-                        className={`flex-1 ${range.color} flex items-center justify-center text-xs font-bold ${range.textColor}`}
+                        className={`${range.color}`}
+                        style={{ flex: range.max - range.min }}
                         title={`${range.label}: ${range.min}-${range.max}`}
+                      >
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Range Labels Below Bar */}
+                  <div className="flex mt-1">
+                    {getBMIRangeInfo().map((range, idx) => (
+                      <div
+                        key={idx}
+                        className={`flex items-center justify-center text-xs font-bold ${range.textColor}`}
+                        style={{ flex: range.max - range.min }}
                       >
                         {range.label}
                       </div>
                     ))}
                   </div>
-
-                  {/* Arrow Indicator */}
-                  {result.bmi && (
-                    (() => {
-                      // Calculate position: BMI goes from 0 to 60
-                      const maxBMI = 60;
-                      const position = Math.min((parseFloat(result.bmi) / maxBMI) * 100, 100);
-                      
-                      return (
-                        <div
-                          className="absolute top-10 flex flex-col items-center transition-all duration-300"
-                          style={{ left: `${position}%`, transform: 'translateX(-50%)' }}
-                        >
-                          {/* Arrow */}
-                          <div className="text-2xl drop-shadow-lg">👇</div>
-                          {/* Value Label */}
-                          <div className="mt-1 bg-gray-800 text-white text-xs font-bold px-2 py-1 rounded whitespace-nowrap drop-shadow-lg">
-                            {result.bmi}
-                          </div>
-                        </div>
-                      );
-                    })()
-                  )}
-                </div>
-
-                {/* Scale Labels */}
-                <div className="flex justify-between text-xs text-gray-500 font-medium">
-                  <span>0</span>
-                  <span>18.5</span>
-                  <span>25</span>
-                  <span>30</span>
-                  <span>60+</span>
                 </div>
               </div>
             </div>

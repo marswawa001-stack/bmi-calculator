@@ -203,7 +203,7 @@ export default function Home() {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Search calculators by name or category..."
+                placeholder=""
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full px-6 py-4 text-lg rounded-full shadow-xl text-gray-900 focus:outline-none focus:ring-4 focus:ring-indigo-300 placeholder-gray-500 bg-white"
