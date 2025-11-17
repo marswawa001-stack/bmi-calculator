@@ -162,7 +162,7 @@ export default function Footer() {
                 </h3>
               </div>
               <p className="text-gray-400 text-sm max-w-xs">
-                All-in-one calculation platform for everyday needs. Fast, accurate, and easy to use.
+                Count on us for all.
               </p>
             </div>
             
