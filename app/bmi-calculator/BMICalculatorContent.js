@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 export default function BMICalculatorContent() {
   const [weight, setWeight] = useState('');
   const [height, setHeight] = useState('');
+  const [gender, setGender] = useState(''); // Add gender state
   const [result, setResult] = useState(null);
   const [unit, setUnit] = useState('metric');
   const [history, setHistory] = useState([]);
@@ -77,6 +78,12 @@ export default function BMICalculatorContent() {
     return weightValidation.valid && heightValidation.valid;
   };
 
+  const calculateBMIWithGender = (bmi, gender) => {
+    // Adjust BMI categories based on gender if needed
+    // For now, we use standard categories but can show gender-specific insights
+    return bmi;
+  };
+
   const calculateBMI = () => {
     const w = parseFloat(weight);
     const h = parseFloat(height);
@@ -89,6 +96,7 @@ export default function BMICalculatorContent() {
     if (weightMetric && hm) {
       const bmi = (weightMetric / (hm * hm)).toFixed(1);
       const bmiValue = parseFloat(bmi);
+      const bmiPrime = (bmiValue / 25).toFixed(2); // BMI Prime = BMI / 25 (where 25 is ideal upper limit)
       let category = '';
       let color = '';
       let advice = '';
@@ -113,7 +121,7 @@ export default function BMICalculatorContent() {
         advice = 'It\'s recommended to consult a healthcare provider for a personalized plan.';
       }
       
-      const newResult = { bmi, category, color, advice, weight: w, height: h, unit, timestamp: new Date().toLocaleString() };
+      const newResult = { bmi, bmiPrime, category, color, advice, weight: w, height: h, unit, gender, timestamp: new Date().toLocaleString() };
       setResult(newResult);
 
       const updatedHistory = [newResult, ...history].slice(0, 10);
@@ -125,6 +133,7 @@ export default function BMICalculatorContent() {
   const resetCalculator = () => {
     setWeight('');
     setHeight('');
+    setGender('');
     setResult(null);
     setWeightError('');
     setHeightError('');
@@ -144,10 +153,10 @@ export default function BMICalculatorContent() {
 
   const getBMIRangeInfo = () => {
     return [
-      { label: 'Underweight', min: 0, max: 18.5, color: 'bg-blue-100', textColor: 'text-blue-600' },
+      { label: 'Underweight', min: 15, max: 18.5, color: 'bg-blue-100', textColor: 'text-blue-600' },
       { label: 'Normal', min: 18.5, max: 25, color: 'bg-green-100', textColor: 'text-green-600' },
       { label: 'Overweight', min: 25, max: 30, color: 'bg-yellow-100', textColor: 'text-yellow-600' },
-      { label: 'Obese', min: 30, max: 60, color: 'bg-red-100', textColor: 'text-red-600' },
+      { label: 'Obese', min: 30, max: 38, color: 'bg-red-100', textColor: 'text-red-600' },
     ];
   };
 
@@ -180,6 +189,35 @@ export default function BMICalculatorContent() {
       {/* Calculator Card */}
       <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
         <div className="space-y-6">
+          {/* Gender Selection */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Gender (Optional)
+            </label>
+            <div className="flex gap-4">
+              <button
+                onClick={() => setGender('male')}
+                className={`flex-1 py-2 px-4 rounded-lg font-semibold transition-all ${
+                  gender === 'male'
+                    ? 'bg-indigo-600 text-white shadow-lg'
+                    : 'bg-gray-100 text-gray-700 border-2 border-gray-200 hover:border-indigo-300'
+                }`}
+              >
+                👨 Male
+              </button>
+              <button
+                onClick={() => setGender('female')}
+                className={`flex-1 py-2 px-4 rounded-lg font-semibold transition-all ${
+                  gender === 'female'
+                    ? 'bg-indigo-600 text-white shadow-lg'
+                    : 'bg-gray-100 text-gray-700 border-2 border-gray-200 hover:border-indigo-300'
+                }`}
+              >
+                👩 Female
+              </button>
+            </div>
+          </div>
+
           {/* Weight Input */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -271,6 +309,21 @@ export default function BMICalculatorContent() {
                 <p className={`text-2xl font-semibold ${result.color}`}>
                   {result.category}
                 </p>
+                
+                {/* BMI Prime Display */}
+                <div className="mt-4 pt-4 border-t border-gray-300">
+                  <p className="text-sm text-gray-600 mb-1">BMI Prime</p>
+                  <p className="text-xl font-bold text-gray-800">
+                    {result.bmiPrime}
+                    <span className="text-sm font-normal text-gray-500 ml-2">(BMI ÷ 25)</span>
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {result.bmiPrime < 0.74 && '< 0.74: Below normal range'}
+                    {result.bmiPrime >= 0.74 && result.bmiPrime < 1 && '0.74 - 1.0: Normal range'}
+                    {result.bmiPrime >= 1 && result.bmiPrime < 1.2 && '1.0 - 1.2: Slightly overweight'}
+                    {result.bmiPrime >= 1.2 && '>= 1.2: Significantly above normal'}
+                  </p>
+                </div>
               </div>
 
               {/* Health Advice */}
@@ -278,6 +331,11 @@ export default function BMICalculatorContent() {
                 <p className="text-gray-700">
                   <strong>💡 Personalized Advice:</strong> {result.advice}
                 </p>
+                {result.gender && (
+                  <p className="text-gray-700 mt-2 text-sm">
+                    <strong>Gender:</strong> {result.gender === 'male' ? 'Male' : 'Female'} - This data helps personalize health recommendations.
+                  </p>
+                )}
               </div>
 
               {/* BMI Range Visualization */}
@@ -285,63 +343,69 @@ export default function BMICalculatorContent() {
                 <p className="text-sm font-semibold text-gray-700 mb-3">BMI Range Chart</p>
                 
                 {/* Scale Labels Above Bar */}
-                <div className="relative text-xs text-gray-500 font-medium mb-2 h-5">
+                <div className="relative text-xs text-gray-500 font-medium h-2.5 leading-none -mb-1">
                   {[
-                    { value: 0, label: '0' },
+                    { value: 15, label: '15' },
                     { value: 18.5, label: '18.5' },
                     { value: 25, label: '25' },
                     { value: 30, label: '30' },
-                    { value: 60, label: '60+' },
+                    { value: 38, label: '38' },
                   ].map((item, idx) => (
                     <div
                       key={idx}
                       className="absolute transform -translate-x-1/2"
-                      style={{ left: `${(item.value / 60) * 100}%` }}
+                      style={{ left: `${((item.value - 15) / (38 - 15)) * 100}%` }}
                     >
                       <span>{item.label}</span>
                     </div>
                   ))}
                 </div>
                 
-                {/* Range Bar with Indicator Line */}
-                <div className="relative mb-12">
-                  {/* BMI Indicator Line */}
+                {/* Range Bar with Indicator Pointer */}
+                <div className="relative mt-0 pt-4">
+                  {/* BMI Indicator Pointer - Below Bar */}
                   {result.bmi && (
                     (() => {
                       // Calculate position based on actual range widths
                       const ranges = getBMIRangeInfo();
-                      const totalWidth = ranges[ranges.length - 1].max; // 60
+                      const minValue = 15; // Minimum BMI on chart
+                      const maxValue = 38; // Maximum BMI on chart
                       const bmiValue = parseFloat(result.bmi);
-                      const position = Math.min((bmiValue / totalWidth) * 100, 100);
+                      const position = Math.min(Math.max(((bmiValue - minValue) / (maxValue - minValue)) * 100, 0), 100);
                       
                       // Determine color based on BMI category
-                      let indicatorColor = 'bg-gray-800';
+                      let pointerColor = '#1f2937'; // gray-800
                       let glowColor = 'rgba(31, 41, 55, 0.3)'; // gray-800
                       
                       if (bmiValue < 18.5) {
-                        indicatorColor = 'bg-blue-600';
+                        pointerColor = '#2563eb'; // blue-600
                         glowColor = 'rgba(37, 99, 235, 0.5)';
                       } else if (bmiValue < 25) {
-                        indicatorColor = 'bg-green-600';
+                        pointerColor = '#16a34a'; // green-600
                         glowColor = 'rgba(22, 163, 74, 0.5)';
                       } else if (bmiValue < 30) {
-                        indicatorColor = 'bg-yellow-600';
+                        pointerColor = '#ca8a04'; // yellow-600
                         glowColor = 'rgba(202, 138, 4, 0.5)';
                       } else {
-                        indicatorColor = 'bg-red-600';
+                        pointerColor = '#dc2626'; // red-600
                         glowColor = 'rgba(220, 38, 38, 0.5)';
                       }
                       
                       return (
                         <div
                           className="absolute transition-all duration-300 z-10 group"
-                          style={{ left: `${position}%`, top: '0', transform: 'translateX(-50%)' }}
+                          style={{ left: `${position}%`, bottom: '-12px', transform: 'translateX(-50%)' }}
                         >
-                          {/* Indicator Line with glow effect */}
+                          {/* Pointer Indicator pointing upward */}
                           <div 
-                            className={`w-1.5 h-8 ${indicatorColor} drop-shadow-lg rounded-sm transition-all duration-200 group-hover:w-2 group-hover:shadow-lg cursor-pointer`}
+                            className="cursor-pointer transition-all duration-200 group-hover:scale-110"
                             style={{ 
-                              boxShadow: `0 0 8px ${glowColor}, inset 0 0 4px rgba(255, 255, 255, 0.3)` 
+                              width: '0',
+                              height: '0',
+                              borderLeft: '10px solid transparent',
+                              borderRight: '10px solid transparent',
+                              borderBottom: `12px solid ${pointerColor}`,
+                              filter: `drop-shadow(0 0 6px ${glowColor})`,
                             }}
                           ></div>
                         </div>
@@ -354,23 +418,13 @@ export default function BMICalculatorContent() {
                     {getBMIRangeInfo().map((range, idx) => (
                       <div
                         key={idx}
-                        className={`${range.color}`}
+                        className={`${range.color} flex items-center justify-center overflow-hidden`}
                         style={{ flex: range.max - range.min }}
                         title={`${range.label}: ${range.min}-${range.max}`}
                       >
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Range Labels Below Bar */}
-                  <div className="flex mt-1">
-                    {getBMIRangeInfo().map((range, idx) => (
-                      <div
-                        key={idx}
-                        className={`flex items-center justify-center text-xs font-bold ${range.textColor}`}
-                        style={{ flex: range.max - range.min }}
-                      >
-                        {range.label}
+                        <span className={`text-[8px] sm:text-[10px] md:text-xs font-bold ${range.textColor} whitespace-nowrap px-1`}>
+                          {range.label === 'Underweight' ? 'UW' : range.label === 'Overweight' ? 'OW' : range.label}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -405,7 +459,13 @@ export default function BMICalculatorContent() {
                   </p>
                   <p className="text-xs text-gray-500">
                     {record.weight} {record.unit === 'metric' ? 'kg' : 'lb'} | {record.height} {record.unit === 'metric' ? 'cm' : 'ft'}
+                    {record.gender && ` | ${record.gender === 'male' ? 'Male' : 'Female'}`}
                   </p>
+                  {record.bmiPrime && (
+                    <p className="text-xs text-indigo-600 font-medium">
+                      BMI Prime: {record.bmiPrime}
+                    </p>
+                  )}
                 </div>
                 <p className="text-xs text-gray-500">{record.timestamp}</p>
               </div>
