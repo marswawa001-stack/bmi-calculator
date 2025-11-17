@@ -161,7 +161,7 @@ export default function Footer() {
                   CalculatorVast
                 </h3>
               </div>
-              <p className="text-gray-400 text-sm max-w-xs">
+              <p className="text-gray-400 text-xl font-bold max-w-xs">
                 Count on us for all.
               </p>
             </div>
