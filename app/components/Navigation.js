@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import Logo from './Logo';
 
 export default function Navigation() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -120,8 +121,11 @@ export default function Navigation() {
       <div className="max-w-7xl mx-auto px-4 py-4 relative">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="text-xl font-bold text-gray-800 hover:text-indigo-600 transition-colors flex-shrink-0">
-            🧮 Free Calculators
+          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity flex-shrink-0">
+            <Logo className="w-8 h-8" />
+            <span className="text-lg font-bold bg-gradient-to-r from-indigo-600 to-indigo-500 bg-clip-text text-transparent">
+              CalculatorVast
+            </span>
           </Link>
 
           {/* Search Bar - Middle (Hidden on home page) */}

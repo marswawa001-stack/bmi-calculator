@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Logo from './Logo';
 
 export default function Footer() {
   const categories = [
@@ -154,14 +155,14 @@ export default function Footer() {
           {/* 第1列 - 品牌区域 */}
           <div>
             <div className="mb-6">
-              <div className="inline-flex items-center justify-center w-10 h-10 bg-indigo-600 rounded-lg mb-3">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                </svg>
+              <div className="flex items-center gap-2 mb-3">
+                <Logo className="w-10 h-10" />
+                <h3 className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-indigo-300 bg-clip-text text-transparent">
+                  CalculatorVast
+                </h3>
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Hownav</h3>
-              <p className="text-gray-400 text-sm">
-                All-in-one calculator for everyday calculations.
+              <p className="text-gray-400 text-sm max-w-xs">
+                All-in-one calculation platform for everyday needs. Fast, accurate, and easy to use.
               </p>
             </div>
             
@@ -263,7 +264,7 @@ export default function Footer() {
       {/* 底部栏 */}
       <div className="max-w-7xl mx-auto px-4 py-6 border-t border-gray-800">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500">
-          <p>&copy; 2024 Hownav Calculator. All rights reserved.</p>
+          <p>&copy; 2024 CalculatorVast. All rights reserved.</p>
           <div className="flex gap-6">
             <a href="#" className="hover:text-indigo-500 transition-colors">Terms</a>
             <a href="#" className="hover:text-indigo-500 transition-colors">Privacy</a>
