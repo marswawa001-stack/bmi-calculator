@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Script from 'next/script';
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -188,19 +189,59 @@ export default function Home() {
     return categoryMatches || calculatorMatches;
   });
 
+  const schemaData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "CalculatorVast",
+    "url": "https://www.calculatorvast.com",
+    "description": "CalculatorVast offers 1000+ free online calculators for every industry and need.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://www.calculatorvast.com?search={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    }
+  };
+
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "CalculatorVast",
+    "url": "https://www.calculatorvast.com",
+    "description": "Free online calculator tools for every industry",
+    "sameAs": [
+      "https://www.facebook.com/calculatorvast",
+      "https://twitter.com/calculatorvast"
+    ]
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      {/* Schema.org Structured Data */}
+      <Script
+        id="website-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
+      />
+      <Script
+        id="organization-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
+
       <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-16 px-4">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-5xl font-bold text-center mb-12">
+          <h1 className="text-4xl lg:text-5xl font-bold text-center mb-12">
             Free {totalCalculators} Calculators for Every Need
           </h1>
-
+          {/* Search Box */}
           <div className="max-w-2xl mx-auto">
             <div className="relative">
               <input
                 type="text"
-                placeholder=""
+                placeholder="Search calculators or categories..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full px-6 py-4 text-lg rounded-full shadow-xl text-gray-900 focus:outline-none focus:ring-4 focus:ring-indigo-300 placeholder-gray-500 bg-white"

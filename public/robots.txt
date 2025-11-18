@@ -1,0 +1,19 @@
+# robots.txt
+# Allow all search engines to crawl the site
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /private
+Disallow: /_next
+Disallow: /api
+
+# Specify sitemap location
+Sitemap: https://www.calculatorvast.com/sitemap.xml
+
+# Set crawl delay for aggressive crawlers (in seconds)
+User-agent: AhrefsBot
+Crawl-delay: 1
+
+User-agent: SemrushBot
+Crawl-delay: 1

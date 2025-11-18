@@ -7,6 +7,7 @@ import Logo from './Logo';
 
 export default function Navigation() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [showSearchModal, setShowSearchModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -101,9 +102,12 @@ export default function Navigation() {
 
   // 选择结果
   const handleSelectResult = (calc) => {
-    router.push(calc.path);
+    if (calc.path) {
+      router.push(calc.path);
+    }
     setSearchQuery('');
     setShowDropdown(false);
+    setShowSearchModal(false);
   };
 
   // 搜索
@@ -120,30 +124,86 @@ export default function Navigation() {
     <nav className="bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 py-4 relative">
         <div className="flex items-center justify-between">
-          {/* Logo */}
+          {/* Left: Logo */}
           <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity flex-shrink-0">
-            <Logo className="w-10 h-10" />
-            <span className="text-3xl font-bold">
+            <Logo className="w-8 h-8 md:w-10 md:h-10" />
+            <span className="text-2xl md:text-3xl font-bold">
               <span className="text-indigo-600">CALCULATOR</span>
               {' '}
               <span className="text-purple-600">VAST</span>
             </span>
           </Link>
 
-          {/* Search Bar - Middle (Hidden on home page) */}
-          {!isHomePage && (
-            <form onSubmit={handleSearch} className="flex-1 flex justify-center px-4">
-              <div className="relative w-full max-w-md">
+          {/* Center: Search Bar (Hidden on home page) */}
+          {/* 搜索框已移至下拉菜单中 */}
+
+          {/* Right: Search Button + Hamburger Menu */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Search Button (appears on mobile or left of hamburger) */}
+            <button
+              onClick={() => setShowSearchModal(!showSearchModal)}
+              className="p-2 text-gray-700 hover:text-indigo-600 transition-colors"
+              aria-label="Search"
+              title="Search"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
+
+            {/* Hamburger Menu */}
+            <button
+              ref={menuButtonRef}
+              onClick={() => setShowMobileMenu(!showMobileMenu)}
+              className="p-2 text-gray-700 hover:text-indigo-600 transition-colors"
+              aria-label="Toggle menu"
+            >
+              <svg
+                className={`w-6 h-6 transition-transform ${showMobileMenu ? 'rotate-90' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Search Modal Dropdown */}
+        {showSearchModal && (
+          <div className="absolute right-4 top-full mt-2 bg-white rounded-lg shadow-xl border border-gray-200 z-10 w-64">
+            {/* Close Button */}
+            <div className="flex items-center justify-end px-4 py-1">
+              <button
+                onClick={() => setShowSearchModal(false)}
+                className="text-pink-500 hover:text-pink-600 transition-colors p-0.5"
+                aria-label="Close search"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Search Input in Modal */}
+            <form onSubmit={handleSearch} className="px-6 py-2 border-b border-gray-200">
+              <div className="relative">
                 <input
-                  ref={searchInputRef}
                   type="text"
-                  placeholder=""
+                  placeholder="Search calculators..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
                   onFocus={() => searchQuery.trim() && setShowDropdown(true)}
                   onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-indigo-500 focus:outline-none text-sm placeholder-gray-600"
+                  autoFocus={true}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-indigo-500 focus:outline-none focus:placeholder-transparent text-sm placeholder-gray-600"
                 />
                 <button
                   type="submit"
@@ -155,21 +215,21 @@ export default function Navigation() {
                   </svg>
                 </button>
 
-                {/* Search Dropdown */}
+                {/* Search Results Dropdown */}
                 {showDropdown && searchResults.length > 0 && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto">
-                    {searchResults.map((calc, index) => (
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-xl z-50 max-h-64 overflow-y-auto">
+                    {searchResults.slice(0, 5).map((calc, index) => (
                       <button
                         key={calc.id}
                         type="button"
-                        onClick={() => handleSelectResult(calc)}
-                        onMouseEnter={() => setSelectedIndex(index)}
-                        className={`w-full px-4 py-3 text-left flex items-center justify-between border-b border-gray-100 hover:bg-indigo-50 transition-colors ${
-                          selectedIndex === index ? 'bg-indigo-50' : ''
-                        } last:border-b-0`}
+                        onClick={() => {
+                          handleSelectResult(calc);
+                          setShowSearchModal(false);
+                        }}
+                        className="w-full px-4 py-3 text-left flex items-center justify-between border-b border-gray-100 hover:bg-indigo-50 transition-colors last:border-b-0"
                       >
                         <div className="flex-1 min-w-0">
-                          <div className="font-medium text-gray-800 truncate">{calc.name}</div>
+                          <div className="font-medium text-gray-800 truncate text-sm">{calc.name}</div>
                           <div className="text-xs text-gray-500">{calc.category}</div>
                         </div>
                         <svg className="w-4 h-4 text-gray-400 flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -177,11 +237,14 @@ export default function Navigation() {
                         </svg>
                       </button>
                     ))}
-                    {searchResults.length > 0 && (
+                    {searchResults.length > 5 && (
                       <div className="px-4 py-2 text-center border-t border-gray-100">
                         <button
                           type="button"
-                          onClick={handleSearch}
+                          onClick={() => {
+                            handleSearch(new Event('submit'));
+                            setShowSearchModal(false);
+                          }}
                           className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
                         >
                           View All Results →
@@ -190,39 +253,10 @@ export default function Navigation() {
                     )}
                   </div>
                 )}
-
-                {/* No Results Message */}
-                {showDropdown && searchQuery.trim() && searchResults.length === 0 && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-xl z-50 px-4 py-3">
-                    <p className="text-sm text-gray-500">No calculators found</p>
-                  </div>
-                )}
               </div>
             </form>
-          )}
-
-          {/* Hamburger Menu */}
-          <button
-            ref={menuButtonRef}
-            onClick={() => setShowMobileMenu(!showMobileMenu)}
-            className="p-2 text-gray-700 hover:text-indigo-600 transition-colors flex-shrink-0"
-            aria-label="Toggle menu"
-          >
-            <svg
-              className={`w-6 h-6 transition-transform ${showMobileMenu ? 'rotate-90' : ''}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </button>
-        </div>
+          </div>
+        )}
 
         {/* Menu Dropdown - Positioned relative to nav container */}
         {showMobileMenu && (
