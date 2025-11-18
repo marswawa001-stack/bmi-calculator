@@ -31,8 +31,10 @@ export default function AboutPage() {
                 alt="Frank Zhao"
                 width={200}
                 height={200}
-                className="w-40 h-40 md:w-48 md:h-48 rounded-2xl shadow-lg object-cover"
+                className="w-40 h-40 md:w-48 md:h-48 rounded-2xl shadow-lg object-cover select-none"
                 priority
+                draggable={false}
+                onContextMenu={(e) => e.preventDefault()}
               />
             </div>
             <div>
