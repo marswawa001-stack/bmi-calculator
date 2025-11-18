@@ -6,6 +6,9 @@ import './globals.css';  // 👈 关键！引入 CSS
 export const metadata = {
   title: "Free Online Calculators - BMI, Age & More",
   description: "Free online calculators for BMI, age calculation, and more. Fast, accurate, and easy to use.",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({ children }) {
