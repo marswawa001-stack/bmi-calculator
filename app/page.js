@@ -322,7 +322,7 @@ export default function Home() {
                     return (
                       <a
                         key={category.id}
-                        href={`/categories/${category.id}`}
+                        href={`/${category.id}`}
                         className={`${category.color} border-2 rounded-xl p-6 transition-all duration-300 hover:shadow-lg hover:scale-105 flex flex-col items-center text-center group`}
                       >
                         <div className="mb-4 transform group-hover:scale-110 transition-transform duration-300">
@@ -363,7 +363,7 @@ export default function Home() {
                 return (
                   <a
                     key={category.id}
-                    href={`/categories/${category.id}`}
+                    href={`/${category.id}`}
                     className={`${category.color} border-2 rounded-xl p-6 transition-all duration-300 hover:shadow-lg hover:scale-105 flex flex-col items-center text-center group`}
                   >
                     <div className="mb-4 transform group-hover:scale-110 transition-transform duration-300">

@@ -279,7 +279,7 @@ export default function Navigation() {
             {categories.map((category) => (
               <Link
                 key={category.id}
-                href={`/categories/${category.id}`}
+                href={`/${category.id}`}
                 onClick={() => setShowMobileMenu(false)}
                 className="block px-6 py-3 text-center text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors font-medium"
               >
