@@ -192,12 +192,9 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-16 px-4">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-5xl font-bold text-center mb-4">
-            Your life in {totalCalculators} free calculators
+          <h1 className="text-5xl font-bold text-center mb-12">
+            Free {totalCalculators} Calculators for Every Need
           </h1>
-          <p className="text-xl text-center text-indigo-100 mb-8">
-            Discover the perfect calculator for any situation
-          </p>
 
           <div className="max-w-2xl mx-auto">
             <div className="relative">

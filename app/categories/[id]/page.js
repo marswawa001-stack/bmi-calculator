@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
@@ -183,7 +183,6 @@ const categoryData = {
 export default function CategoryPage() {
   const params = useParams();
   const category = categoryData[params.id];
-  const [searchQuery, setSearchQuery] = useState('');
 
   if (!category) {
     return (
@@ -198,17 +197,6 @@ export default function CategoryPage() {
       </div>
     );
   }
-
-  // 过滤计算器
-  const filteredCalculators = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return category.calculators;
-    }
-    return category.calculators.filter(calc =>
-      calc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      calc.description.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [category.calculators, searchQuery]);
 
   // 获取相关分类
   const relatedCategories = Object.entries(categoryData)
@@ -248,28 +236,13 @@ export default function CategoryPage() {
         </div>
 
         {/* Search in Category */}
-        {category.calculators.length > 0 && (
-          <div className="mb-8">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search calculators in this category..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className={`w-full px-4 py-3 border-2 ${category.borderColor} rounded-lg focus:border-indigo-500 focus:outline-none text-gray-900 bg-white`}
-              />
-              <svg className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-          </div>
-        )}
+        {/* Removed - redundant with navigation search bar */}
 
         {/* 计算器网格 */}
-        {filteredCalculators.length > 0 ? (
+        {category.calculators.length > 0 ? (
           <div className="mb-16">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredCalculators.map((calc) => (
+              {category.calculators.map((calc) => (
                 <Link
                   key={calc.id}
                   href={calc.path}
@@ -298,16 +271,6 @@ export default function CategoryPage() {
                 </Link>
               ))}
             </div>
-          </div>
-        ) : searchQuery.trim() ? (
-          <div className={`${category.bgColor} border-2 ${category.borderColor} rounded-xl p-12 text-center mb-16`}>
-            <p className="text-gray-600 text-lg mb-4">No calculators found matching your search</p>
-            <button
-              onClick={() => setSearchQuery('')}
-              className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors"
-            >
-              Clear Search
-            </button>
           </div>
         ) : (
           <div className={`${category.bgColor} border-2 ${category.borderColor} rounded-xl p-12 text-center mb-16`}>
