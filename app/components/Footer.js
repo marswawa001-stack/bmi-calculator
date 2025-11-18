@@ -157,11 +157,13 @@ export default function Footer() {
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-3">
                 <Logo className="w-10 h-10" />
-                <h3 className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-indigo-300 bg-clip-text text-transparent">
-                  CalculatorVast
+                <h3 className="text-3xl font-bold">
+                  <span className="text-indigo-600">CALCULATOR</span>
+                  {' '}
+                  <span className="text-purple-600">VAST</span>
                 </h3>
               </div>
-              <p className="text-indigo-400 text-2xl font-bold max-w-xs">
+              <p className="text-indigo-400 text-3xl font-bold max-w-xs">
                 Count on us for all.
               </p>
             </div>

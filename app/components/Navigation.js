@@ -122,9 +122,11 @@ export default function Navigation() {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity flex-shrink-0">
-            <Logo className="w-8 h-8" />
-            <span className="text-lg font-bold bg-gradient-to-r from-indigo-600 to-indigo-500 bg-clip-text text-transparent">
-              CalculatorVast
+            <Logo className="w-10 h-10" />
+            <span className="text-3xl font-bold">
+              <span className="text-indigo-600">CALCULATOR</span>
+              {' '}
+              <span className="text-purple-600">VAST</span>
             </span>
           </Link>
 
