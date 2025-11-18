@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import FeedbackButton from '../components/FeedbackButton';
 
 export default function BMICalculatorContent() {
   const [weight, setWeight] = useState('');
@@ -296,6 +297,11 @@ export default function BMICalculatorContent() {
             >
               Reset
             </button>
+          </div>
+
+          {/* Feedback Button - Centered */}
+          <div className="flex justify-center mt-6">
+            <FeedbackButton calculatorName="BMI Calculator" />
           </div>
 
           {/* Result Display */}

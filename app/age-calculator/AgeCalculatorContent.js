@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import FeedbackButton from '../components/FeedbackButton';
 
 export default function AgeCalculatorContent() {
   const [startDay, setStartDay] = useState('');
@@ -286,6 +287,11 @@ export default function AgeCalculatorContent() {
             >
               Reset
             </button>
+          </div>
+
+          {/* Feedback Button - Centered */}
+          <div className="flex justify-center mt-6">
+            <FeedbackButton calculatorName="Age Calculator" />
           </div>
 
           {/* Result Display */}
