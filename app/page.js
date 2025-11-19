@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import Script from 'next/script';
+import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -415,6 +417,71 @@ export default function Home() {
                 Calculate your exact age in years, months, days, and even total weeks lived.
               </p>
             </a>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 py-16 px-4 border-t-2 border-indigo-100">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl font-bold text-gray-800 mb-12 text-center">
+            Meet the Creator
+          </h2>
+
+          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-start bg-white rounded-2xl pt-4 md:pt-6 px-8 md:px-12 shadow-lg border-2 border-indigo-100">
+            {/* Left: Photo + Buttons */}
+            <div className="flex flex-col items-center">
+              <div className="relative mb-8">
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full blur-lg opacity-25"></div>
+                <Image
+                  src="/frank-zhao.jpg"
+                  alt="Frank Zhao - Creator of CalculatorVast"
+                  width={280}
+                  height={280}
+                  className="relative w-64 h-64 md:w-72 md:h-72 rounded-full shadow-xl object-cover select-none"
+                  draggable={false}
+                  onContextMenu={(e) => e.preventDefault()}
+                  priority
+                />
+              </div>
+
+              <div className="space-y-3 w-full">
+              </div>
+            </div>
+
+            {/* Right: Content */}
+            <div className="flex flex-col justify-start">
+              <div className="flex items-center gap-3 mb-6">
+                <h3 className="text-3xl font-bold text-gray-900">Frank Zhao</h3>
+                {/* Social Links */}
+                <div className="flex gap-2">
+                  <a href="https://www.facebook.com/CalculatorVast/about" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center text-blue-600 hover:opacity-70 transition-opacity" aria-label="Facebook">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                    </svg>
+                  </a>
+                  <a href="https://x.com/CalculatorVast" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center text-gray-900 hover:opacity-70 transition-opacity" aria-label="X">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.6l-5.17-6.763-5.91 6.763h-3.308l7.73-8.835L2.56 2.25h6.6l4.69 6.197 5.594-6.197zM16.966 19.75h1.829L7.084 4.126H5.117l11.849 15.624z" />
+                    </svg>
+                  </a>
+                  <a href="https://www.linkedin.com/in/frank-zhao-ba82a9392/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center text-blue-700 hover:opacity-70 transition-opacity" aria-label="LinkedIn">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.475-2.236-1.986-2.236-1.081 0-1.722.722-2.004 1.418-.103.249-.129.597-.129.946v5.441h-3.554s.05-8.736 0-9.646h3.554v1.348c.429-.645 1.196-1.565 2.922-1.565 2.135 0 3.734 1.39 3.734 4.38v5.483zM5.337 7.433c-1.144 0-1.915-.748-1.915-1.682 0-.951.765-1.684 1.959-1.684 1.188 0 1.914.733 1.939 1.684 0 .934-.751 1.682-1.983 1.682zm1.581 13.019H3.656V9.806h3.262v10.646zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+              <p className="text-indigo-600 font-semibold mb-4">Full-time Creator of CalculatorVast</p>
+              
+              <p className="text-gray-700 leading-relaxed mb-4">
+                Hey, I'm Frank! I build calculators that actually work. I'll admit to a touch of OCD – each one is put through a relentless testing process (my own minor obsession) to ensure you get a tool you can really rely on. (PS: Meticulously crafted from the ancient city of Xi'an, China.) <Link href="/about" className="bg-pink-500 hover:bg-pink-600 text-white font-semibold px-2 py-1 rounded">Learn more about me</Link> or <Link href="/contact" className="bg-pink-500 hover:bg-pink-600 text-white font-semibold px-2 py-1 rounded">suggest a calculation</Link> for your needs.
+              </p>
+
+              <p className="text-gray-600 text-sm">
+                <strong>Background:</strong> Northeastern University<br />
+                <strong>Passion:</strong> IT, Programming & Building Reliable Tools
+              </p>
+            </div>
           </div>
         </div>
       </div>

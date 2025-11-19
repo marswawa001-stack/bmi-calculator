@@ -1,4 +1,5 @@
 import BMICalculatorContent from './BMICalculatorContent';
+import CreatorCard from '../components/CreatorCard';
 
 export const metadata = {
   title: "Free BMI Calculator - Calculate Your Body Mass Index Online",
@@ -52,6 +53,9 @@ export default function BMICalculatorPage() {
             Free, accurate, and instant results with personalized health recommendations
           </p>
         </div>
+
+        {/* Creator Card */}
+        <CreatorCard />
 
         {/* Calculator Content */}
         <BMICalculatorContent />
