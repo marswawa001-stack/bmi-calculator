@@ -474,7 +474,7 @@ export default function Home() {
               <p className="text-indigo-600 font-semibold mb-4">Full-time Creator of CalculatorVast</p>
               
               <p className="text-gray-700 leading-relaxed mb-4">
-                Hey, I'm Frank! I build calculators that actually work. I'll admit to a touch of OCD – each one is put through a relentless testing process (my own minor obsession) to ensure you get a tool you can really rely on. (PS: Meticulously crafted from the ancient city of Xi'an, China.) <Link href="/about" className="bg-pink-500 hover:bg-pink-600 text-white font-semibold px-2 py-1 rounded">Learn more about me</Link> or <Link href="/contact" className="bg-pink-500 hover:bg-pink-600 text-white font-semibold px-2 py-1 rounded">suggest a calculation</Link> for your needs.
+                Hey, I'm Frank! I build calculators that actually work. I'll admit to a touch of OCD – each one is put through a relentless testing process (my own minor obsession) to ensure you get a tool you can really rely on. (PS: Meticulously crafted from the ancient city of Xi'an, China.) <Link href="/about" className="bg-pink-500 hover:bg-pink-600 text-white font-semibold px-2 py-0.5 rounded">Learn more about me</Link> or <Link href="/contact" className="bg-pink-500 hover:bg-pink-600 text-white font-semibold px-2 py-0.5 rounded">suggest a calculation</Link> for your needs.
               </p>
 
               <p className="text-gray-600 text-sm">

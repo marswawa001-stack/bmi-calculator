@@ -41,7 +41,7 @@ export default function CreatorCard() {
           </div>
 
           {/* Creator Info */}
-          <div className="flex-1 flex flex-col justify-center space-y-3">
+          <div className="flex-1 flex flex-col justify-center space-y-1.5">
             <div className="flex items-center gap-2">
               <span className="inline-block px-2 py-1 bg-pink-500 text-white rounded text-xs font-bold">Creator</span>
               <span className="text-gray-800 text-sm">Frank Zhao</span>
