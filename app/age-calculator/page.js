@@ -1,4 +1,5 @@
 import AgeCalculatorContent from './AgeCalculatorContent';
+import CreatorCard from '../components/CreatorCard';
 
 export default function AgeCalculatorPage() {
   return (
@@ -31,6 +32,9 @@ export default function AgeCalculatorPage() {
               Free, accurate, and instant results with multiple time interval formats
             </p>
           </div>
+
+        {/* Creator Card */}
+        <CreatorCard showSources={false} />
 
         {/* Calculator Content */}
         <AgeCalculatorContent />

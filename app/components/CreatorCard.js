@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
-export default function CreatorCard() {
+export default function CreatorCard({ showSources = true }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const references = [
@@ -69,7 +69,8 @@ export default function CreatorCard() {
         </div>
       </div>
 
-      {/* Sources Dropdown */}
+      {/* Sources Dropdown - Only show if showSources is true */}
+      {showSources && (
       <div className="bg-white rounded-xl shadow-md overflow-hidden">
         <button
           onClick={() => setIsExpanded(!isExpanded)}
@@ -112,6 +113,7 @@ export default function CreatorCard() {
           </div>
         )}
       </div>
+      )}
     </div>
   );
 }
