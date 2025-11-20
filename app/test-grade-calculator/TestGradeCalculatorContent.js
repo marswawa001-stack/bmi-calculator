@@ -7,10 +7,14 @@ export default function TestGradeCalculatorContent() {
   const [totalQuestions, setTotalQuestions] = useState('');
   const [wrongAnswers, setWrongAnswers] = useState('');
   const [correctAnswers, setCorrectAnswers] = useState('');
-  const [inputMode, setInputMode] = useState('wrong');
+  const [inputMode, setInputMode] = useState('correct');
   const [result, setResult] = useState(null);
   const [toast, setToast] = useState({ show: false, message: '', type: 'error' });
   const [showScaleEditor, setShowScaleEditor] = useState(false);
+  const [queryCorrectScore, setQueryCorrectScore] = useState('');
+  const [queryResult, setQueryResult] = useState(null);
+  const [activeSegment, setActiveSegment] = useState(0);
+  const [segmentCache, setSegmentCache] = useState({});
 
   const [gradingScale, setGradingScale] = useState({
     'A+': 97,
@@ -31,25 +35,36 @@ export default function TestGradeCalculatorContent() {
 
   const gradeRanges = [
     { letter: 'A+', min: 97, max: 100 },
-    { letter: 'A', min: 93, max: 96 },
-    { letter: 'A-', min: 90, max: 92 },
-    { letter: 'B+', min: 87, max: 89 },
-    { letter: 'B', min: 83, max: 86 },
-    { letter: 'B-', min: 80, max: 82 },
-    { letter: 'C+', min: 77, max: 79 },
-    { letter: 'C', min: 73, max: 76 },
-    { letter: 'C-', min: 70, max: 72 },
-    { letter: 'D+', min: 67, max: 69 },
-    { letter: 'D', min: 63, max: 66 },
-    { letter: 'D-', min: 60, max: 62 },
-    { letter: 'F', min: 0, max: 59 },
+    { letter: 'A', min: 93, max: 96.99 },
+    { letter: 'A-', min: 90, max: 92.99 },
+    { letter: 'B+', min: 87, max: 89.99 },
+    { letter: 'B', min: 83, max: 86.99 },
+    { letter: 'B-', min: 80, max: 82.99 },
+    { letter: 'C+', min: 77, max: 79.99 },
+    { letter: 'C', min: 73, max: 76.99 },
+    { letter: 'C-', min: 70, max: 72.99 },
+    { letter: 'D+', min: 67, max: 69.99 },
+    { letter: 'D', min: 63, max: 66.99 },
+    { letter: 'D-', min: 60, max: 62.99 },
+    { letter: 'F', min: 0, max: 59.99 },
   ];
 
-  const gradeTable = useMemo(() => {
-    if (!totalQuestions || isNaN(totalQuestions)) return [];
-    const total = parseFloat(totalQuestions);
+  // 生成成绩表的函数，支持指定范围和采样
+  const generateGradeTable = (total, startScore = 0, endScore = null) => {
+    if (!endScore) endScore = total;
+    
     const table = [];
-    for (let i = total; i >= 0; i--) {
+    const rangeSize = endScore - startScore;
+    
+    // 计算采样步长
+    let step = 1;
+    // 只有当 total > 10000 时才采样，否则显示所有分数
+    if (total > 10000 && rangeSize > 50) {
+      step = Math.ceil(rangeSize / 50);
+    }
+    
+    // 显示分数序列（可能采样），从最低分到最高分
+    for (let i = startScore; i <= Math.min(Math.floor(endScore), total); i += step) {
       const correct = i;
       const percentage = Math.round((correct / total) * 100 * 100) / 100;
       let grade = 'F';
@@ -61,8 +76,101 @@ export default function TestGradeCalculatorContent() {
       }
       table.push({ correct, wrong: total - correct, percentage, grade });
     }
+    
+    // 确保包含终点
+    if (table.length === 0 || table[table.length - 1].correct !== Math.min(Math.floor(endScore), total)) {
+      const correct = Math.min(Math.floor(endScore), total);
+      const percentage = Math.round((correct / total) * 100 * 100) / 100;
+      let grade = 'F';
+      for (const range of gradeRanges) {
+        if (percentage >= range.min && percentage <= range.max) {
+          grade = range.letter;
+          break;
+        }
+      }
+      table.push({ correct, wrong: total - correct, percentage, grade });
+    }
+    
     return table;
+  };
+
+  // 计算分段信息
+  const getSegmentInfo = useMemo(() => {
+    if (!totalQuestions || isNaN(totalQuestions)) return { shouldSegment: false, segments: [] };
+    const total = parseFloat(totalQuestions);
+    
+    // 只有 > 500 才分段
+    if (total <= 500) {
+      return { shouldSegment: false, segments: [] };
+    }
+    
+    const segments = [];
+    
+    if (total <= 10000) {
+      // ≤ 10000：第一个分段是 0-500，之后按固定粒度分段
+      let segmentSize = 100;
+      if (total > 5000) segmentSize = 500;
+      else if (total > 2000) segmentSize = 200;
+      else if (total > 1000) segmentSize = 150;
+      
+      // 第一个分段始终是 0-500
+      segments.push({ start: 0, end: 500, label: '0-500' });
+      
+      // 之后按动态粒度继续分段
+      for (let start = 500; start < total; start += segmentSize) {
+        const end = Math.min(start + segmentSize, total);
+        segments.push({ start, end, label: `${start}-${end}` });
+      }
+    } else {
+      // > 10000：按百分比分段，目标是 20 个分段
+      const segmentSize = Math.ceil(total / 20);
+      for (let start = 0; start < total; start += segmentSize) {
+        const end = Math.min(start + segmentSize, total);
+        segments.push({ start, end, label: `${start}-${end}` });
+      }
+    }
+    
+    return { shouldSegment: true, segments };
   }, [totalQuestions]);
+
+  // 获取当前段的表格数据（懒加载）
+  const getSegmentTable = (segmentIndex) => {
+    if (!totalQuestions || isNaN(totalQuestions)) return [];
+    const total = parseFloat(totalQuestions);
+    
+    // 如果不需要分段，返回完整表格
+    if (!getSegmentInfo.shouldSegment) {
+      return generateGradeTable(total, 0, total);
+    }
+    
+    // 验证 segmentIndex 的有效性
+    if (segmentIndex < 0 || segmentIndex >= getSegmentInfo.segments.length) {
+      return [];
+    }
+    
+    // 需要分段时，只生成当前分段的数据
+    const cacheKey = `${totalQuestions}_${segmentIndex}`;
+    if (segmentCache[cacheKey]) {
+      return segmentCache[cacheKey];
+    }
+    
+    const segment = getSegmentInfo.segments[segmentIndex];
+    if (!segment) {
+      return [];
+    }
+    
+    const table = generateGradeTable(total, segment.start, segment.end);
+    
+    // 缓存这个段的数据
+    setSegmentCache(prev => ({ ...prev, [cacheKey]: table }));
+    
+    return table;
+  };
+
+  // 获取当前要显示的表格
+  const gradeTable = useMemo(() => {
+    return getSegmentTable(activeSegment);
+  }, [totalQuestions, activeSegment, getSegmentInfo, segmentCache]);
 
   const validateInput = (val) => {
     if (val === '') return { valid: false, error: '' };
@@ -73,6 +181,98 @@ export default function TestGradeCalculatorContent() {
       return { valid: false, error: 'Must be greater than or equal to 0' };
     }
     return { valid: true, error: '' };
+  };
+
+  const getGradeForScore = (correct, total) => {
+    const percentage = Math.round((correct / total) * 100 * 100) / 100;
+    let grade = 'F';
+    for (const range of gradeRanges) {
+      if (percentage >= range.min && percentage <= range.max) {
+        grade = range.letter;
+        break;
+      }
+    }
+    return { correct, wrong: total - correct, percentage, grade };
+  };
+
+  const handleQueryGrade = () => {
+    if (!totalQuestions) {
+      showToast('Please enter the total number of questions first', 'error');
+      return;
+    }
+
+    if (!queryCorrectScore) {
+      showToast('Please enter a score to query', 'error');
+      return;
+    }
+
+    const totalNum = parseFloat(totalQuestions);
+    const scoreNum = parseFloat(queryCorrectScore);
+
+    const validation = validateInput(queryCorrectScore);
+    if (!validation.valid) {
+      showToast(validation.error, 'error');
+      return;
+    }
+
+    if (scoreNum > totalNum) {
+      showToast(`Score cannot exceed total questions (${totalNum})`, 'error');
+      return;
+    }
+
+    const result = getGradeForScore(scoreNum, totalNum);
+    setQueryResult(result);
+    
+    // 如果启用了分段，自动跳转到包含该分数的分段
+    if (getSegmentInfo.shouldSegment && getSegmentInfo.segments.length > 0) {
+      const segmentIndex = getSegmentInfo.segments.findIndex(
+        segment => scoreNum >= segment.start && scoreNum <= segment.end
+      );
+      if (segmentIndex !== -1) {
+        setActiveSegment(segmentIndex);
+        
+        // 滚动分段选项卡到视图中
+        setTimeout(() => {
+          const segmentButtons = document.querySelectorAll('#grade-table .flex button');
+          if (segmentButtons.length > segmentIndex) {
+            const targetButton = segmentButtons[segmentIndex];
+            targetButton.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+          }
+        }, 30);
+      }
+    }
+    
+    // 延迟后滚动到高亮的列（不滑动屏幕）
+    setTimeout(() => {
+      const tableBody = document.querySelector('#grade-table table tbody');
+      if (tableBody) {
+        const cells = tableBody.querySelectorAll('td');
+        let targetCell = null;
+        
+        // 找到第一行（%行）中对应的高亮列
+        if (cells.length > 0) {
+          const firstRowCells = Array.from(cells).slice(0, gradeTable.length + 1);
+          for (let i = 1; i < firstRowCells.length; i++) {
+            const cell = firstRowCells[i];
+            if (cell.classList.contains('bg-yellow-100')) {
+              targetCell = cell;
+              break;
+            }
+          }
+        }
+        
+        if (targetCell) {
+          targetCell.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+      }
+    }, 50);
+  };
+
+  const handleQueryInputKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleQueryGrade();
+    }
   };
 
   const calculateGrade = () => {
@@ -172,7 +372,9 @@ export default function TestGradeCalculatorContent() {
     setWrongAnswers('');
     setCorrectAnswers('');
     setResult(null);
-    setInputMode('wrong');
+    setInputMode('correct');
+    setActiveSegment(0);
+    setSegmentCache({});
   };
 
   const handleInputChange = (value, setter) => {
@@ -180,6 +382,29 @@ export default function TestGradeCalculatorContent() {
       setter(value);
     }
   };
+
+  const handleTotalQuestionsChange = (value) => {
+    const MAX_TOTAL = 1000000;
+    if (value === '') {
+      setTotalQuestions('');
+      setActiveSegment(0);
+      return;
+    }
+    if (/^(\d+\.?\d*|\.\d+)?$/.test(value)) {
+      const numValue = parseFloat(value);
+      if (numValue <= 0) {
+        showToast('Must be greater than 0', 'error');
+        return;
+      }
+      if (numValue > MAX_TOTAL) {
+        showToast(`Maximum allowed value is ${MAX_TOTAL.toLocaleString()}`, 'error');
+        return;
+      }
+      setTotalQuestions(value);
+      setActiveSegment(0);
+    }
+  };
+
   const handleScaleChange = (letter, value) => {
     // 允许用户自由输入，存储到临时状态
     setScaleEditValues(prev => ({ ...prev, [letter]: value }));
@@ -311,32 +536,32 @@ export default function TestGradeCalculatorContent() {
 
         <div className="mb-6">
           <label className="block text-sm font-semibold text-gray-700 mb-2">Total Questions/Points</label>
-          <input type="text" value={totalQuestions} onChange={(e) => handleInputChange(e.target.value, setTotalQuestions)} onKeyDown={(e) => e.key === 'Enter' && calculateGrade()} placeholder="e.g., 40" className="w-full px-4 py-3 bg-white border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors text-gray-900 font-medium placeholder-gray-500" />
+          <input type="text" value={totalQuestions} onChange={(e) => handleTotalQuestionsChange(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && calculateGrade()} placeholder="e.g., 40" className="w-full px-4 py-3 bg-white border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors text-gray-900 font-medium placeholder-gray-500" />
         </div>
 
         <div className="mb-6">
           <label className="block text-sm font-semibold text-gray-700 mb-3">Input Mode</label>
           <div className="flex gap-4">
             <label className="flex items-center cursor-pointer">
-              <input type="radio" value="wrong" checked={inputMode === 'wrong'} onChange={(e) => setInputMode(e.target.value)} className="w-4 h-4 text-blue-600" />
-              <span className="ml-2 text-gray-700">Wrong Answers</span>
-            </label>
-            <label className="flex items-center cursor-pointer">
               <input type="radio" value="correct" checked={inputMode === 'correct'} onChange={(e) => setInputMode(e.target.value)} className="w-4 h-4 text-blue-600" />
               <span className="ml-2 text-gray-700">Correct Answers</span>
+            </label>
+            <label className="flex items-center cursor-pointer">
+              <input type="radio" value="wrong" checked={inputMode === 'wrong'} onChange={(e) => setInputMode(e.target.value)} className="w-4 h-4 text-blue-600" />
+              <span className="ml-2 text-gray-700">Wrong Answers</span>
             </label>
           </div>
         </div>
 
-        {inputMode === 'wrong' ? (
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Number of Wrong Answers</label>
-            <input type="text" value={wrongAnswers} onChange={(e) => handleInputChange(e.target.value, setWrongAnswers)} onKeyDown={(e) => e.key === 'Enter' && calculateGrade()} placeholder="e.g., 5" className="w-full px-4 py-3 bg-white border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors text-gray-900 font-medium placeholder-gray-500" />
-          </div>
-        ) : (
+        {inputMode === 'correct' ? (
           <div className="mb-6">
             <label className="block text-sm font-semibold text-gray-700 mb-2">Number of Correct Answers</label>
             <input type="text" value={correctAnswers} onChange={(e) => handleInputChange(e.target.value, setCorrectAnswers)} onKeyDown={(e) => e.key === 'Enter' && calculateGrade()} placeholder="e.g., 35" className="w-full px-4 py-3 bg-white border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors text-gray-900 font-medium placeholder-gray-500" />
+          </div>
+        ) : (
+          <div className="mb-6">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Number of Wrong Answers</label>
+            <input type="text" value={wrongAnswers} onChange={(e) => handleInputChange(e.target.value, setWrongAnswers)} onKeyDown={(e) => e.key === 'Enter' && calculateGrade()} placeholder="e.g., 5" className="w-full px-4 py-3 bg-white border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors text-gray-900 font-medium placeholder-gray-500" />
           </div>
         )}
 
@@ -422,18 +647,92 @@ export default function TestGradeCalculatorContent() {
         )}
       </div>
 
-      {/* Grade Table */}
+      {/* Score Query Tool */}
       {totalQuestions && !isNaN(totalQuestions) && (
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
+          <h3 className="text-xl font-bold text-gray-800 mb-4">Query Your Score</h3>
+          <p className="text-sm text-gray-600 mb-4">Enter a specific score to find out the corresponding grade and percentage:</p>
+          <div className="flex gap-3">
+            <div className="flex-1">
+              <input
+                type="text"
+                value={queryCorrectScore}
+                onChange={(e) => handleInputChange(e.target.value, setQueryCorrectScore)}
+                onKeyDown={handleQueryInputKeyDown}
+                placeholder={`e.g., 85 (out of ${totalQuestions})`}
+                className="w-full px-4 py-3 bg-white border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors text-gray-900 font-medium placeholder-gray-500"
+              />
+            </div>
+            <button
+              onClick={handleQueryGrade}
+              className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-3 px-8 rounded-lg transition-all transform hover:scale-105 shadow-lg"
+            >
+              Query
+            </button>
+          </div>
+
+          {queryResult && (
+            <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border-l-4 border-blue-600">
+                <p className="text-sm text-gray-600 mb-1">Correct</p>
+                <p className="text-2xl font-bold text-blue-600">{queryResult.correct}</p>
+              </div>
+              <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-4 border-l-4 border-red-600">
+                <p className="text-sm text-gray-600 mb-1">Wrong</p>
+                <p className="text-2xl font-bold text-red-600">{queryResult.wrong}</p>
+              </div>
+              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border-l-4 border-green-600">
+                <p className="text-sm text-gray-600 mb-1">Percentage</p>
+                <p className="text-2xl font-bold text-green-600">{queryResult.percentage}%</p>
+              </div>
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border-l-4 border-purple-600">
+                <p className="text-sm text-gray-600 mb-1">Grade</p>
+                <p className={`text-2xl font-bold ${queryResult.grade.includes('A') ? 'text-green-600' : queryResult.grade.includes('B') ? 'text-blue-600' : queryResult.grade.includes('C') ? 'text-yellow-600' : queryResult.grade.includes('D') ? 'text-orange-600' : 'text-red-600'}`}>
+                  {queryResult.grade}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Grade Table with Segments */}
+      {totalQuestions && !isNaN(totalQuestions) && (
+        <div id="grade-table" className="bg-white rounded-2xl shadow-xl p-8 mb-8">
           <h3 className="text-xl font-bold text-gray-800 mb-4">Grade Table</h3>
-          <p className="text-sm text-gray-600 mb-4">This table shows the grade for every possible score:</p>
+          <p className="text-sm text-gray-600 mb-4">This table shows the grade for selected scores:</p>
+          
+          {/* Segment Tabs (only show if needed) */}
+          {getSegmentInfo.shouldSegment && (
+            <div className="mb-6 overflow-x-auto">
+              <div className="flex gap-2 pb-2">
+                {getSegmentInfo.segments.map((segment, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveSegment(idx)}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
+                      activeSegment === idx
+                        ? 'bg-blue-600 text-white shadow-md'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    {segment.label}
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500 mt-2">Click to view scores in this range (data loads on demand)</p>
+            </div>
+          )}
+
           <div className="overflow-x-auto">
             <table className="w-full text-sm border-collapse">
               <thead>
                 <tr className="border-b-2 border-gray-300">
                   <th className="text-left py-2 px-3 font-semibold text-gray-700 sticky left-0 bg-white">Score</th>
                   {gradeTable.map((row, idx) => (
-                    <th key={idx} className="text-center py-2 px-2 font-semibold text-gray-700 min-w-[60px]">{row.correct}/{totalQuestions}</th>
+                    <th key={idx} className={`text-center py-2 px-2 font-semibold text-gray-700 min-w-[60px] transition-colors ${
+                      queryResult && row.correct === queryResult.correct ? 'bg-yellow-200' : ''
+                    }`}>{row.correct}/{totalQuestions}</th>
                   ))}
                 </tr>
               </thead>
@@ -441,13 +740,17 @@ export default function TestGradeCalculatorContent() {
                 <tr className="border-b border-gray-200">
                   <td className="py-2 px-3 font-semibold text-gray-700 sticky left-0 bg-white">%</td>
                   {gradeTable.map((row, idx) => (
-                    <td key={idx} className="text-center py-2 px-2 text-gray-700">{row.percentage}%</td>
+                    <td key={idx} className={`text-center py-2 px-2 text-gray-700 transition-colors ${
+                      queryResult && row.correct === queryResult.correct ? 'bg-yellow-100' : ''
+                    }`}>{row.percentage}%</td>
                   ))}
                 </tr>
                 <tr className="border-b border-gray-200">
                   <td className="py-2 px-3 font-semibold text-gray-700 sticky left-0 bg-white">Grade</td>
                   {gradeTable.map((row, idx) => (
-                    <td key={idx} className={`text-center py-2 px-2 font-bold ${row.grade.includes('A') ? 'text-green-600' : row.grade.includes('B') ? 'text-blue-600' : row.grade.includes('C') ? 'text-yellow-600' : row.grade.includes('D') ? 'text-orange-600' : 'text-red-600'}`}>{row.grade}</td>
+                    <td key={idx} className={`text-center py-2 px-2 font-bold transition-colors ${row.grade.includes('A') ? 'text-green-600' : row.grade.includes('B') ? 'text-blue-600' : row.grade.includes('C') ? 'text-yellow-600' : row.grade.includes('D') ? 'text-orange-600' : 'text-red-600'} ${
+                      queryResult && row.correct === queryResult.correct ? 'bg-yellow-100' : ''
+                    }`}>{row.grade}</td>
                   ))}
                 </tr>
               </tbody>
