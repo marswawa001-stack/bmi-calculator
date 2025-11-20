@@ -191,6 +191,15 @@ export const categoryData = {
     bgColor: 'bg-slate-50',
     borderColor: 'border-slate-200',
     iconBg: 'bg-slate-100',
-    calculators: []
+    calculators: [
+      {
+        id: 'test-grade-calculator',
+        name: 'Test Grade Calculator',
+        description: 'Calculate your test score and letter grade with customizable grading scale',
+        icon: '📊',
+        path: '/test-grade-calculator',
+        popular: false
+      }
+    ]
   }
 };
