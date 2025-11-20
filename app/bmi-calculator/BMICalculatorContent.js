@@ -479,6 +479,164 @@ export default function BMICalculatorContent() {
           </div>
         </div>
       )}
+
+      {/* FAQ Section */}
+      <div className="space-y-6">
+        {/* How do I calculate BMI? */}
+        <div className="bg-white rounded-2xl shadow-lg p-8">
+          <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">❓ How do I calculate BMI?</h2>
+          <div className="space-y-4 text-gray-700">
+            <p>
+              BMI (Body Mass Index) is calculated using a simple formula:
+            </p>
+            <div className="bg-indigo-50 p-4 rounded-lg border-l-4 border-indigo-600">
+              <p className="font-bold text-center text-lg">BMI = Weight (kg) ÷ Height (m)²</p>
+            </div>
+            <p>
+              Simply enter your weight and height into our calculator above, and it will automatically compute your BMI. Our tool supports both metric (kg, cm) and imperial (lb, ft) units for your convenience. Regardless of which unit you choose, the calculator internally converts to metric and uses the standard formula above.
+            </p>
+          </div>
+        </div>
+
+        {/* Normal BMI */}
+        <div className="bg-white rounded-2xl shadow-lg p-8">
+          <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">✅ Normal BMI</h2>
+          <div className="space-y-4 text-gray-700">
+            <p>
+              A normal BMI is typically considered to be between <strong>18.5 and 24.9</strong>. This range indicates that your weight is proportionate to your height and is generally associated with lower health risks.
+            </p>
+            <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-600">
+              <p className="font-semibold text-green-800">💚 Normal BMI Range: 18.5 - 24.9</p>
+              <p className="text-sm mt-2">Maintaining a normal BMI is associated with better overall health outcomes and reduced risk of chronic diseases.</p>
+            </div>
+            <p>
+              To maintain a normal BMI, focus on:
+            </p>
+            <ul className="list-disc list-inside space-y-2 ml-2">
+              <li>Regular physical activity (at least 150 minutes per week)</li>
+              <li>A balanced diet rich in fruits, vegetables, and whole grains</li>
+              <li>Adequate sleep and stress management</li>
+              <li>Regular health check-ups</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* What are the BMI ranges? */}
+        <div className="bg-white rounded-2xl shadow-lg p-8">
+          <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">📊 What are the BMI ranges?</h2>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-600">
+                <p className="font-bold text-blue-800">Underweight</p>
+                <p className="text-sm text-gray-700 mt-1">BMI: Below 18.5</p>
+                <p className="text-xs text-gray-600 mt-2">May indicate insufficient weight. Consider consulting healthcare provider.</p>
+              </div>
+              <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-600">
+                <p className="font-bold text-green-800">Normal Weight</p>
+                <p className="text-sm text-gray-700 mt-1">BMI: 18.5 - 24.9</p>
+                <p className="text-xs text-gray-600 mt-2">Healthy weight range. Maintain with regular exercise and balanced diet.</p>
+              </div>
+              <div className="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-600">
+                <p className="font-bold text-yellow-800">Overweight</p>
+                <p className="text-sm text-gray-700 mt-1">BMI: 25.0 - 29.9</p>
+                <p className="text-xs text-gray-600 mt-2">Slightly above healthy range. Consider increasing activity and adjusting diet.</p>
+              </div>
+              <div className="bg-red-50 p-4 rounded-lg border-l-4 border-red-600">
+                <p className="font-bold text-red-800">Obese</p>
+                <p className="text-sm text-gray-700 mt-1">BMI: 30.0 and above</p>
+                <p className="text-xs text-gray-600 mt-2">Increased health risks. Consult healthcare provider for personalized guidance.</p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600 mt-4 text-center">
+              <em>Note: BMI is a screening tool and does not directly measure body fat or account for muscle mass, bone density, or other factors.</em>
+            </p>
+          </div>
+        </div>
+
+        {/* Using our body mass index calculator */}
+        <div className="bg-white rounded-2xl shadow-lg p-8">
+          <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">🔧 Using our body mass index calculator</h2>
+          <div className="space-y-4 text-gray-700">
+            <p>
+              Our BMI calculator is easy to use and provides instant results:
+            </p>
+            <ol className="list-decimal list-inside space-y-3 ml-2">
+              <li><strong>Select Your Unit:</strong> Choose between metric (kg, cm) or imperial (lb, ft) units at the top.</li>
+              <li><strong>Enter Your Gender (Optional):</strong> Select your gender to help personalize health recommendations.</li>
+              <li><strong>Input Your Weight:</strong> Enter your weight in the selected unit.</li>
+              <li><strong>Input Your Height:</strong> Enter your height in the selected unit.</li>
+              <li><strong>Calculate:</strong> Click the "Calculate BMI" button to get your result.</li>
+              <li><strong>View Results:</strong> Your BMI, category, and personalized advice will appear instantly.</li>
+            </ol>
+            <div className="bg-indigo-50 p-4 rounded-lg border-l-4 border-indigo-600 mt-4">
+              <p className="text-sm font-semibold">💡 Pro Tip: Your calculation history is saved automatically, allowing you to track your progress over time.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Other considerations */}
+        <div className="bg-white rounded-2xl shadow-lg p-8">
+          <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">🎯 Other considerations</h2>
+          <div className="space-y-4 text-gray-700">
+            <p>
+              While BMI is a useful screening tool, it's important to consider other factors:
+            </p>
+            <div className="space-y-3">
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <p className="font-semibold text-gray-800">🏋️ Muscle Mass</p>
+                <p className="text-sm mt-1">Muscular individuals may have a higher BMI but lower body fat percentage. BMI doesn't distinguish between muscle and fat.</p>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <p className="font-semibold text-gray-800">🧬 Genetic Factors</p>
+                <p className="text-sm mt-1">Genetics influence metabolism, body composition, and weight distribution. What's healthy varies from person to person.</p>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <p className="font-semibold text-gray-800">📏 Body Composition</p>
+                <p className="text-sm mt-1">Distribution of fat, bone, and muscle affects overall health. Two people with the same BMI may have different health profiles.</p>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <p className="font-semibold text-gray-800">👴 Age and Gender</p>
+                <p className="text-sm mt-1">BMI interpretation may differ based on age and gender. Children, elderly, and certain populations may have different healthy ranges.</p>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <p className="font-semibold text-gray-800">🏥 Medical Conditions</p>
+                <p className="text-sm mt-1">Certain medical conditions can affect weight and BMI. Always consult healthcare professionals for comprehensive health assessment.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* FAQs */}
+        <div className="bg-white rounded-2xl shadow-lg p-8">
+          <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">❔ FAQs</h2>
+          <div className="space-y-4">
+            <div className="border-b border-gray-200 pb-4">
+              <p className="font-semibold text-gray-800">Q: Is BMI accurate for everyone?</p>
+              <p className="text-sm text-gray-700 mt-2">A: BMI is a screening tool, not a diagnostic measure. It may not be accurate for athletes, elderly people, children, or pregnant women. Always consult healthcare professionals for personalized assessment.</p>
+            </div>
+            <div className="border-b border-gray-200 pb-4">
+              <p className="font-semibold text-gray-800">Q: How often should I calculate my BMI?</p>
+              <p className="text-sm text-gray-700 mt-2">A: You can track BMI monthly or quarterly as part of your health monitoring routine. Significant changes should prompt a consultation with your healthcare provider.</p>
+            </div>
+            <div className="border-b border-gray-200 pb-4">
+              <p className="font-semibold text-gray-800">Q: Can BMI predict health?</p>
+              <p className="text-sm text-gray-700 mt-2">A: BMI is correlated with health risks but doesn't predict individual health. Other factors like blood pressure, cholesterol, fitness level, and family history are equally important.</p>
+            </div>
+            <div className="border-b border-gray-200 pb-4">
+              <p className="font-semibold text-gray-800">Q: What should I do if my BMI is outside the normal range?</p>
+              <p className="text-sm text-gray-700 mt-2">A: Consult with a healthcare provider or registered dietitian. They can provide personalized guidance based on your individual health profile and circumstances.</p>
+            </div>
+            <div className="border-b border-gray-200 pb-4">
+              <p className="font-semibold text-gray-800">Q: Does BMI account for muscle mass?</p>
+              <p className="text-sm text-gray-700 mt-2">A: No, BMI only uses height and weight. For a complete body composition analysis, consider additional measurements like waist circumference or body fat percentage.</p>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-800">Q: Can I use this calculator for children?</p>
+              <p className="text-sm text-gray-700 mt-2">A: This calculator is designed for adults. Children and teens have different BMI categories based on age and gender percentiles. Consult your pediatrician for children's BMI assessment.</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 }

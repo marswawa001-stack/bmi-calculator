@@ -28,7 +28,7 @@ export default function CreatorCard({ showSources = true, customReferences = nul
     <div className="mt-8 mb-8">
       {/* Creator Info Card */}
       <div className="bg-white rounded-xl shadow-md p-6 mb-4">
-        <div className="flex gap-6 items-center">
+        <div className="flex flex-col items-center gap-6">
           {/* Avatar */}
           <div className="flex-shrink-0">
             <div className="w-24 h-24 rounded-full overflow-hidden shadow-lg">
@@ -42,8 +42,8 @@ export default function CreatorCard({ showSources = true, customReferences = nul
             </div>
           </div>
 
-          {/* Creator Info */}
-          <div className="flex-1 flex flex-col justify-center space-y-1.5">
+          {/* Creator Info - Single Line */}
+          <div className="flex items-center gap-4 flex-wrap justify-center">
             <div className="flex items-center gap-2">
               <span className="inline-block px-2 py-1 bg-pink-500 text-white rounded text-xs font-bold">Creator</span>
               <span className="text-gray-800 text-sm">Frank Zhao</span>
@@ -59,14 +59,16 @@ export default function CreatorCard({ showSources = true, customReferences = nul
                 </svg>
               </a>
             </div>
-            <p className="text-gray-600 text-sm">
-              <span className="inline-block px-2 py-0.5 bg-pink-500 text-white rounded text-xs font-bold mr-2">Background</span>
-              Northeastern University
-            </p>
-            <p className="text-gray-600 text-sm">
-              <span className="inline-block px-2 py-0.5 bg-pink-500 text-white rounded text-xs font-bold mr-2">Passion</span>
-              Full-Stack Engineering
-            </p>
+            <span className="text-gray-300">|</span>
+            <div className="flex items-center gap-2">
+              <span className="inline-block px-2 py-0.5 bg-pink-500 text-white rounded text-xs font-bold">Background</span>
+              <span className="text-gray-600 text-sm">Northeastern University</span>
+            </div>
+            <span className="text-gray-300">|</span>
+            <div className="flex items-center gap-2">
+              <span className="inline-block px-2 py-0.5 bg-pink-500 text-white rounded text-xs font-bold">Passion</span>
+              <span className="text-gray-600 text-sm">Full-Stack Engineering</span>
+            </div>
           </div>
         </div>
       </div>
