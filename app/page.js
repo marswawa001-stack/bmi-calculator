@@ -108,17 +108,17 @@ export default function Home() {
         </svg>
       ),
     },
-    {
-      id: 'math',
-      name: 'Math',
-      count: 0,
-      color: 'bg-blue-50 hover:bg-blue-100 border-blue-200',
-      icon: (
-        <svg className="w-12 h-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-        </svg>
-      ),
-    },
+      {
+        id: 'math',
+        name: 'Math',
+        count: 0,
+        color: 'bg-blue-50 hover:bg-blue-100 border-blue-200',
+        icon: (
+          <svg className="w-12 h-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+          </svg>
+        ),
+      },
     {
       id: 'physics',
       name: 'Physics',
@@ -153,16 +153,16 @@ export default function Home() {
       ),
     },
     {
-      id: 'other',
-      name: 'Other',
-      count: 0,
-      color: 'bg-slate-50 hover:bg-slate-100 border-slate-200',
-      icon: (
-        <svg className="w-12 h-12 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-        </svg>
-      ),
-    },
+        id: 'other',
+        name: 'Other',
+        count: 1,
+        color: 'bg-slate-50 hover:bg-slate-100 border-slate-200',
+        icon: (
+          <svg className="w-12 h-12 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+          </svg>
+        ),
+      },
   ];
 
   const calculators = [
@@ -183,6 +183,12 @@ export default function Home() {
       name: 'P-Value Calculator', 
       categoryId: 'statistics',
       description: 'Calculate p-values for statistical tests including t-test, z-test, and chi-square test.'
+    },
+    { 
+      id: 'test-grade-calculator', 
+      name: 'Test Grade Calculator', 
+      categoryId: 'other',
+      description: 'Calculate your test score and letter grade instantly. Supports custom grading scales.'
     },
   ];
 
@@ -399,7 +405,7 @@ export default function Home() {
             Popular Calculators
           </h2>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <a
               href="/bmi-calculator"
               className="group bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-6 hover:shadow-xl transition-all duration-300"
@@ -433,6 +439,18 @@ export default function Home() {
               </h3>
               <p className="text-gray-600">
                 Calculate p-values for t-tests, z-tests, and chi-square tests to assess statistical significance.
+              </p>
+            </a>
+
+            <a
+              href="/test-grade-calculator"
+              className="group bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-xl p-6 hover:shadow-xl transition-all duration-300"
+            >
+              <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-amber-600">
+                Test Grade Calculator
+              </h3>
+              <p className="text-gray-600">
+                Calculate your test score and letter grade instantly with a standard grading scale.
               </p>
             </a>
           </div>
