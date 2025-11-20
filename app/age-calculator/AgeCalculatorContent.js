@@ -938,13 +938,11 @@ export default function AgeCalculatorContent() {
       <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
         <div className="space-y-6">
           {/* Start Date Input */}
-          <div>
-            <div className="flex items-center gap-3 flex-wrap justify-center">
-              {/* Label */}
-              <label className="text-sm font-semibold text-gray-700">
-                Start Date
-              </label>
-              
+          <div className="text-center">
+            <label className="text-sm font-semibold text-gray-700 block mb-2">
+              Start Date
+            </label>
+            <div className="flex flex-col sm:flex-row items-center sm:items-center gap-3 sm:flex-wrap sm:justify-center">
               {/* Date Input */}
               {renderDateInput(startDateInput, setStartDateInput, startDateSelection, setStartDateSelection, 'start')}
               
@@ -974,13 +972,11 @@ export default function AgeCalculatorContent() {
           </div>
 
           {/* End Date Input */}
-          <div>
-            <div className="flex items-center gap-3 flex-wrap justify-center">
-              {/* Label */}
-              <label className="text-sm font-semibold text-gray-700">
-                End Date
-              </label>
-              
+          <div className="text-center">
+            <label className="text-sm font-semibold text-gray-700 block mb-2">
+              End Date
+            </label>
+            <div className="flex flex-col sm:flex-row items-center sm:items-center gap-3 sm:flex-wrap sm:justify-center">
               {/* Date Input */}
               {renderDateInput(endDateInput, setEndDateInput, endDateSelection, setEndDateSelection, 'end')}
               
@@ -1071,84 +1067,76 @@ export default function AgeCalculatorContent() {
               </div>
             </div>
           )}
-
-        {/* Simple Calendar Picker for Start Date */}
-        {showStartCalendarPicker && (
-          <div className="fixed inset-0 z-40" onClick={() => setShowStartCalendarPicker(false)}>
-            <div className="fixed bg-white rounded-lg shadow-xl border border-gray-200 z-50" style={{
-              top: `${calendarPosition.top}px`,
-              left: `${calendarPosition.left}px`,
-              width: '320px'
-            }} onClick={(e) => e.stopPropagation()}>
-              <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-                <h3 className="font-bold text-gray-800">Select Start Date</h3>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => {
-                      const today = new Date();
-                      const month = String(today.getMonth() + 1).padStart(2, '0');
-                      const day = String(today.getDate()).padStart(2, '0');
-                      const year = today.getFullYear();
-                      setStartDateInput(`${month}/${day}/${year}`);
-                      setShowStartCalendarPicker(false);
-                    }}
-                    className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm font-medium transition-colors"
-                  >
-                    Today
-                  </button>
-                  <button onClick={() => setShowStartCalendarPicker(false)} className="text-xl text-gray-500 hover:text-gray-700">×</button>
-                </div>
-              </div>
-              <SimpleCalendar 
-                onDateSelect={(month, day, year) => {
-                  setStartDateInput(`${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}/${year}`);
-                  setShowStartCalendarPicker(false);
-                }}
-                currentDate={validateDate(startDateInput) ? parseDate(startDateInput) : null}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Simple Calendar Picker for End Date */}
-        {showEndCalendarPicker && (
-          <div className="fixed inset-0 z-40" onClick={() => setShowEndCalendarPicker(false)}>
-            <div className="fixed bg-white rounded-lg shadow-xl border border-gray-200 z-50" style={{
-              top: `${calendarPosition.top}px`,
-              left: `${calendarPosition.left}px`,
-              width: '320px'
-            }} onClick={(e) => e.stopPropagation()}>
-              <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-                <h3 className="font-bold text-gray-800">Select End Date</h3>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => {
-                      const today = new Date();
-                      const month = String(today.getMonth() + 1).padStart(2, '0');
-                      const day = String(today.getDate()).padStart(2, '0');
-                      const year = today.getFullYear();
-                      setEndDateInput(`${month}/${day}/${year}`);
-                      setShowEndCalendarPicker(false);
-                    }}
-                    className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm font-medium transition-colors"
-                  >
-                    Today
-                  </button>
-                  <button onClick={() => setShowEndCalendarPicker(false)} className="text-xl text-gray-500 hover:text-gray-700">×</button>
-                </div>
-              </div>
-              <SimpleCalendar 
-                onDateSelect={(month, day, year) => {
-                  setEndDateInput(`${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}/${year}`);
-                  setShowEndCalendarPicker(false);
-                }}
-                currentDate={validateDate(endDateInput) ? parseDate(endDateInput) : null}
-              />
-            </div>
-          </div>
-        )}
         </div>
       </div>
+
+      {/* Simple Calendar Picker for Start Date */}
+      {showStartCalendarPicker && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center p-4" onClick={() => setShowStartCalendarPicker(false)}>
+          <div className="bg-white rounded-lg shadow-xl border border-gray-200 z-50 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
+            <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+              <h3 className="font-bold text-gray-800">Select Start Date</h3>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    const today = new Date();
+                    const month = String(today.getMonth() + 1).padStart(2, '0');
+                    const day = String(today.getDate()).padStart(2, '0');
+                    const year = today.getFullYear();
+                    setStartDateInput(`${month}/${day}/${year}`);
+                    setShowStartCalendarPicker(false);
+                  }}
+                  className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm font-medium transition-colors"
+                >
+                  Today
+                </button>
+                <button onClick={() => setShowStartCalendarPicker(false)} className="text-xl text-gray-500 hover:text-gray-700">×</button>
+              </div>
+            </div>
+            <SimpleCalendar 
+              onDateSelect={(month, day, year) => {
+                setStartDateInput(`${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}/${year}`);
+                setShowStartCalendarPicker(false);
+              }}
+              currentDate={validateDate(startDateInput) ? parseDate(startDateInput) : null}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Simple Calendar Picker for End Date */}
+      {showEndCalendarPicker && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center p-4" onClick={() => setShowEndCalendarPicker(false)}>
+          <div className="bg-white rounded-lg shadow-xl border border-gray-200 z-50 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
+            <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+              <h3 className="font-bold text-gray-800">Select End Date</h3>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    const today = new Date();
+                    const month = String(today.getMonth() + 1).padStart(2, '0');
+                    const day = String(today.getDate()).padStart(2, '0');
+                    const year = today.getFullYear();
+                    setEndDateInput(`${month}/${day}/${year}`);
+                    setShowEndCalendarPicker(false);
+                  }}
+                  className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm font-medium transition-colors"
+                >
+                  Today
+                </button>
+                <button onClick={() => setShowEndCalendarPicker(false)} className="text-xl text-gray-500 hover:text-gray-700">×</button>
+              </div>
+            </div>
+            <SimpleCalendar 
+              onDateSelect={(month, day, year) => {
+                setEndDateInput(`${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}/${year}`);
+                setShowEndCalendarPicker(false);
+              }}
+              currentDate={validateDate(endDateInput) ? parseDate(endDateInput) : null}
+            />
+          </div>
+        </div>
+      )}
     </>
   );
 }
