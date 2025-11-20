@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import FeedbackButton from '../components/FeedbackButton';
 
 export default function AgeCalculatorContent() {
@@ -26,6 +26,11 @@ export default function AgeCalculatorContent() {
   
   const [result, setResult] = useState(null);
   const [toast, setToast] = useState({ show: false, message: '', type: 'error' });
+  const [showStartCalendarPicker, setShowStartCalendarPicker] = useState(false);
+  const [showEndCalendarPicker, setShowEndCalendarPicker] = useState(false);
+  const [calendarPosition, setCalendarPosition] = useState({ top: 0, left: 0 });
+  const startCalendarButtonRef = useRef(null);
+  const endCalendarButtonRef = useRef(null);
 
   const monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -716,68 +721,18 @@ export default function AgeCalculatorContent() {
 
           {/* Calendar Icon Button */}
           <button
+            ref={dateType === 'start' ? startCalendarButtonRef : endCalendarButtonRef}
             onClick={(e) => {
-              // Create a native date input to open system date picker
-              const input = document.createElement('input');
-              input.type = 'date';
-              input.style.position = 'fixed';
-              input.style.left = `${e.clientX}px`;
-              input.style.top = `${e.clientY}px`;
-              input.style.opacity = '0';
-              input.style.width = '1px';
-              input.style.height = '1px';
-              input.style.zIndex = '9999';
-              
-              // Always set a value - either current or today
-              if (validateDate(dateStr)) {
-                const parts = parseDate(dateStr);
-                if (parts) {
-                  const [month, day, year] = parts;
-                  input.value = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                }
+              const rect = e.currentTarget.getBoundingClientRect();
+              setCalendarPosition({
+                top: rect.top + rect.height / 2,
+                left: rect.left + rect.width / 2
+              });
+              if (dateType === 'start') {
+                setShowStartCalendarPicker(!showStartCalendarPicker);
+              } else {
+                setShowEndCalendarPicker(!showEndCalendarPicker);
               }
-              // Note: Don't set a default value, let user choose or clear
-              
-              const cleanup = () => {
-                if (document.body.contains(input)) {
-                  document.body.removeChild(input);
-                }
-              };
-              
-              input.onchange = (e) => {
-                const selectedDate = e.target.value;
-                if (selectedDate) {
-                  const [year, month, day] = selectedDate.split('-');
-                  setDate(`${String(parseInt(month))}/${String(parseInt(day))}/${year}`);
-                } else {
-                  // Handle clear button - reset to placeholder
-                  setDate('mm/dd/yyyy');
-                }
-                cleanup();
-              };
-              
-              input.onblur = () => {
-                setTimeout(() => {
-                  cleanup();
-                }, 100);
-              };
-              
-              // Listen for input event to catch clear action immediately
-              input.oninput = (e) => {
-                if (!e.target.value) {
-                  setDate('mm/dd/yyyy');
-                }
-              };
-              
-              document.body.appendChild(input);
-              setTimeout(() => {
-                input.focus();
-                try {
-                  input.showPicker();
-                } catch (err) {
-                  console.log('showPicker not supported');
-                }
-              }, 0);
             }}
             className="ml-1 px-2 py-1 bg-green-500 hover:bg-green-600 text-white rounded transition-colors flex-shrink-0"
             title="Open calendar picker"
@@ -1116,8 +1071,174 @@ export default function AgeCalculatorContent() {
               </div>
             </div>
           )}
+
+        {/* Simple Calendar Picker for Start Date */}
+        {showStartCalendarPicker && (
+          <div className="fixed inset-0 z-40" onClick={() => setShowStartCalendarPicker(false)}>
+            <div className="fixed bg-white rounded-lg shadow-xl border border-gray-200 z-50" style={{
+              top: `${calendarPosition.top}px`,
+              left: `${calendarPosition.left}px`,
+              width: '320px'
+            }} onClick={(e) => e.stopPropagation()}>
+              <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+                <h3 className="font-bold text-gray-800">Select Start Date</h3>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      const today = new Date();
+                      const month = String(today.getMonth() + 1).padStart(2, '0');
+                      const day = String(today.getDate()).padStart(2, '0');
+                      const year = today.getFullYear();
+                      setStartDateInput(`${month}/${day}/${year}`);
+                      setShowStartCalendarPicker(false);
+                    }}
+                    className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm font-medium transition-colors"
+                  >
+                    Today
+                  </button>
+                  <button onClick={() => setShowStartCalendarPicker(false)} className="text-xl text-gray-500 hover:text-gray-700">×</button>
+                </div>
+              </div>
+              <SimpleCalendar 
+                onDateSelect={(month, day, year) => {
+                  setStartDateInput(`${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}/${year}`);
+                  setShowStartCalendarPicker(false);
+                }}
+                currentDate={validateDate(startDateInput) ? parseDate(startDateInput) : null}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Simple Calendar Picker for End Date */}
+        {showEndCalendarPicker && (
+          <div className="fixed inset-0 z-40" onClick={() => setShowEndCalendarPicker(false)}>
+            <div className="fixed bg-white rounded-lg shadow-xl border border-gray-200 z-50" style={{
+              top: `${calendarPosition.top}px`,
+              left: `${calendarPosition.left}px`,
+              width: '320px'
+            }} onClick={(e) => e.stopPropagation()}>
+              <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+                <h3 className="font-bold text-gray-800">Select End Date</h3>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      const today = new Date();
+                      const month = String(today.getMonth() + 1).padStart(2, '0');
+                      const day = String(today.getDate()).padStart(2, '0');
+                      const year = today.getFullYear();
+                      setEndDateInput(`${month}/${day}/${year}`);
+                      setShowEndCalendarPicker(false);
+                    }}
+                    className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm font-medium transition-colors"
+                  >
+                    Today
+                  </button>
+                  <button onClick={() => setShowEndCalendarPicker(false)} className="text-xl text-gray-500 hover:text-gray-700">×</button>
+                </div>
+              </div>
+              <SimpleCalendar 
+                onDateSelect={(month, day, year) => {
+                  setEndDateInput(`${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}/${year}`);
+                  setShowEndCalendarPicker(false);
+                }}
+                currentDate={validateDate(endDateInput) ? parseDate(endDateInput) : null}
+              />
+            </div>
+          </div>
+        )}
         </div>
       </div>
     </>
+  );
+}
+
+// Simple Calendar Component - does not use useState for performance
+function SimpleCalendar({ onDateSelect, currentDate }) {
+  const [month, setMonth] = useState(currentDate ? currentDate[0] : new Date().getMonth() + 1);
+  const [year, setYear] = useState(currentDate ? currentDate[2] : new Date().getFullYear());
+
+  const getDaysInMonth = (m, y) => {
+    return new Date(y, m, 0).getDate();
+  };
+
+  const getFirstDayOfMonth = (m, y) => {
+    return new Date(y, m - 1, 1).getDay();
+  };
+
+  const daysInMonth = getDaysInMonth(month, year);
+  const firstDay = getFirstDayOfMonth(month, year);
+  const days = [];
+
+  // Add empty cells for days before month starts
+  for (let i = 0; i < firstDay; i++) {
+    days.push(null);
+  }
+
+  // Add days of the month
+  for (let i = 1; i <= daysInMonth; i++) {
+    days.push(i);
+  }
+
+  return (
+    <div className="p-4">
+      <div className="flex justify-between items-center mb-4 gap-2">
+        <button 
+          onClick={() => setMonth(month === 1 ? 12 : month - 1)}
+          className="px-3 py-1 hover:bg-gray-100 rounded text-gray-800 font-bold text-lg"
+        >
+          ←
+        </button>
+        <select 
+          value={month}
+          onChange={(e) => setMonth(parseInt(e.target.value))}
+          className="border border-gray-300 rounded px-3 py-1 text-gray-800 font-semibold bg-white cursor-pointer"
+        >
+          {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((m, i) => (
+            <option key={i + 1} value={i + 1}>{m}</option>
+          ))}
+        </select>
+        <select 
+          value={year}
+          onChange={(e) => setYear(parseInt(e.target.value))}
+          className="border border-gray-300 rounded px-3 py-1 text-gray-800 font-semibold bg-white cursor-pointer"
+        >
+          {Array.from({ length: 100 }, (_, i) => year - 50 + i).map(y => (
+            <option key={y} value={y}>{y}</option>
+          ))}
+        </select>
+        <button 
+          onClick={() => setMonth(month === 12 ? 1 : month + 1)}
+          className="px-3 py-1 hover:bg-gray-100 rounded text-gray-800 font-bold text-lg"
+        >
+          →
+        </button>
+      </div>
+
+      <div className="grid grid-cols-7 gap-1 mb-2">
+        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
+          <div key={d} className="text-center font-bold text-gray-700 text-sm">{d}</div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-7 gap-1">
+        {days.map((day, idx) => (
+          <button
+            key={idx}
+            onClick={() => day && onDateSelect(month, day, year)}
+            className={`py-2 rounded text-sm font-medium ${
+              day === null
+                ? 'bg-gray-50 cursor-default text-transparent'
+                : currentDate && currentDate[0] === month && currentDate[1] === day && currentDate[2] === year
+                ? 'bg-blue-600 text-white font-bold'
+                : 'hover:bg-blue-100 hover:text-blue-900 cursor-pointer text-gray-800'
+            }`}
+            disabled={day === null}
+          >
+            {day || '0'}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
