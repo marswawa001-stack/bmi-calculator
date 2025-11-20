@@ -64,7 +64,7 @@ export default function FeedbackButton({ calculatorName = 'Calculator' }) {
   return (
     <>
       {/* Feedback Section */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center justify-center gap-3">
         {/* Feedback Prompt Text */}
         <p className="text-sm text-pink-600 font-medium">
           We'd love to hear your feedback

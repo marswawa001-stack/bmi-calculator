@@ -144,7 +144,7 @@ export default function Home() {
     {
       id: 'statistics',
       name: 'Statistics',
-      count: 0,
+      count: 1,
       color: 'bg-cyan-50 hover:bg-cyan-100 border-cyan-200',
       icon: (
         <svg className="w-12 h-12 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -177,6 +177,12 @@ export default function Home() {
       name: 'Age Calculator', 
       categoryId: 'health',
       description: 'Calculate your exact age in years, months, days, and even total weeks lived.'
+    },
+    { 
+      id: 'p-value-calculator', 
+      name: 'P-Value Calculator', 
+      categoryId: 'statistics',
+      description: 'Calculate p-values for statistical tests including t-test, z-test, and chi-square test.'
     },
   ];
 
@@ -393,7 +399,7 @@ export default function Home() {
             Popular Calculators
           </h2>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-3 gap-6">
             <a
               href="/bmi-calculator"
               className="group bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-6 hover:shadow-xl transition-all duration-300"
@@ -415,6 +421,18 @@ export default function Home() {
               </h3>
               <p className="text-gray-600">
                 Calculate your exact age in years, months, days, and even total weeks lived.
+              </p>
+            </a>
+
+            <a
+              href="/p-value-calculator"
+              className="group bg-gradient-to-r from-cyan-50 to-emerald-50 border-2 border-cyan-200 rounded-xl p-6 hover:shadow-xl transition-all duration-300"
+            >
+              <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-cyan-600">
+                P-Value Calculator
+              </h3>
+              <p className="text-gray-600">
+                Calculate p-values for t-tests, z-tests, and chi-square tests to assess statistical significance.
               </p>
             </a>
           </div>
@@ -450,7 +468,7 @@ export default function Home() {
 
             {/* Right: Content */}
             <div className="flex flex-col justify-start">
-              <div className="flex items-center gap-3 mb-6">
+              <div className="flex items-center gap-3 mb-3">
                 <h3 className="text-3xl font-bold text-gray-900">Frank Zhao</h3>
                 {/* Social Links */}
                 <div className="flex gap-2">
@@ -471,7 +489,7 @@ export default function Home() {
                   </a>
                 </div>
               </div>
-              <p className="text-indigo-600 font-semibold mb-4">Full-time Creator of CalculatorVast</p>
+              <p className="text-indigo-600 font-semibold mb-2">Full-time Creator of CalculatorVast</p>
               
               <p className="text-gray-700 leading-relaxed mb-4">
                 Hey, I'm Frank! I build calculators that actually work. I'll admit to a touch of OCD – each one is put through a relentless testing process (my own minor obsession) to ensure you get a tool you can really rely on. (PS: Meticulously crafted from the ancient city of Xi'an, China.) <Link href="/about" className="bg-pink-500 hover:bg-pink-600 text-white font-semibold px-2 py-0.5 rounded">Learn more about me</Link> or <Link href="/contact" className="bg-pink-500 hover:bg-pink-600 text-white font-semibold px-2 py-0.5 rounded">suggest a calculation</Link> for your needs.

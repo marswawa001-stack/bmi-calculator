@@ -4,10 +4,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
-export default function CreatorCard({ showSources = true }) {
+export default function CreatorCard({ showSources = true, customReferences = null }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const references = [
+  const defaultReferences = [
     {
       authors: "Nuttall FQ.",
       title: "Body Mass Index: Obesity, BMI, and Health: A Critical Review.",
@@ -21,6 +21,8 @@ export default function CreatorCard({ showSources = true }) {
       url: "https://pubmed.ncbi.nlm.nih.gov/27146380/"
     }
   ];
+  
+  const references = customReferences || defaultReferences;
 
   return (
     <div className="mt-8 mb-8">
@@ -78,7 +80,7 @@ export default function CreatorCard({ showSources = true }) {
         >
           <div className="flex items-center gap-2">
             <span className="text-lg">📖</span>
-            <span className="text-gray-800 font-medium">Based on 2 sources</span>
+            <span className="text-gray-800 font-medium">Based on {references.length} sources</span>
           </div>
           <svg
             className={`w-5 h-5 text-gray-600 transition-transform ${
