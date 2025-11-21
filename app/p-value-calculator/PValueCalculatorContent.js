@@ -238,6 +238,13 @@ export default function PValueCalculatorContent() {
     return parseFloat(val) > 0;
   };
   
+  const validateDF = (val) => {
+    if (val === '') return true;
+    if (!/^(\d+\.?\d*|\.\d+)$/.test(val)) return false;
+    const num = parseFloat(val);
+    return num > 0 && num <= 10000;
+  };
+  
   // Auto-recalculate when tail type changes if there's already a result
   useEffect(() => {
     if (result) {
@@ -250,13 +257,13 @@ export default function PValueCalculatorContent() {
   useEffect(() => {
     const canCalculate = () => {
       if (testType === 'chi-square') {
-        return chiSquare && chiDf && validateInput(chiSquare) && validateInput(chiDf);
+        return chiSquare && chiDf && validateInput(chiSquare) && validateDF(chiDf);
       } else if (testType === 't-test') {
-        return statistic && df && validateInput(statistic) && validateInput(df);
+        return statistic && df && validateInput(statistic) && validateDF(df);
       } else if (testType === 'z-test') {
         return statistic && validateInput(statistic);
       } else if (testType === 'f-test') {
-        return fStatistic && df1 && df2 && validateInput(fStatistic) && validateInput(df1) && validateInput(df2);
+        return fStatistic && df1 && df2 && validateInput(fStatistic) && validateDF(df1) && validateDF(df2);
       }
       return false;
     };
@@ -273,8 +280,12 @@ export default function PValueCalculatorContent() {
     setError('');
     
     if (testType === 't-test') {
-      if (!validateInput(statistic) || !validateInput(df)) {
-        setError('Please enter valid positive numbers for t-statistic and degrees of freedom');
+      if (!validateInput(statistic) || !validateDF(df)) {
+        if (!validateDF(df) && df && parseFloat(df) > 10000) {
+          setError('Degrees of freedom cannot exceed 10000!');
+        } else {
+          setError('Please enter valid positive numbers for t-statistic and degrees of freedom');
+        }
         return;
       }
       
@@ -334,8 +345,12 @@ export default function PValueCalculatorContent() {
         tailType,
       });
     } else if (testType === 'chi-square') {
-      if (!validateInput(chiSquare) || !validateInput(chiDf)) {
-        setError('Please enter valid positive numbers for chi-square and degrees of freedom');
+      if (!validateInput(chiSquare) || !validateDF(chiDf)) {
+        if (!validateDF(chiDf) && chiDf && parseFloat(chiDf) > 10000) {
+          setError('Degrees of freedom cannot exceed 10000!');
+        } else {
+          setError('Please enter valid positive numbers for chi-square and degrees of freedom');
+        }
         return;
       }
       
@@ -372,8 +387,12 @@ export default function PValueCalculatorContent() {
         tailType: chiTailType,
       });
     } else if (testType === 'f-test') {
-      if (!validateInput(fStatistic) || !validateInput(df1) || !validateInput(df2)) {
-        setError('Please enter valid positive numbers for F-statistic and degrees of freedom');
+      if (!validateInput(fStatistic) || !validateDF(df1) || !validateDF(df2)) {
+        if ((!validateDF(df1) && df1 && parseFloat(df1) > 10000) || (!validateDF(df2) && df2 && parseFloat(df2) > 10000)) {
+          setError('Degrees of freedom cannot exceed 10000!');
+        } else {
+          setError('Please enter valid positive numbers for F-statistic and degrees of freedom');
+        }
         return;
       }
       
@@ -628,6 +647,9 @@ export default function PValueCalculatorContent() {
                     placeholder="e.g., 5"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-600 text-gray-800 bg-white"
                   />
+                  {df1 && parseFloat(df1) > 10000 && (
+                    <p className="text-red-600 text-sm mt-1 font-semibold">⚠️ Cannot exceed 10000!</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -640,6 +662,9 @@ export default function PValueCalculatorContent() {
                     placeholder="e.g., 10"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-600 text-gray-800 bg-white"
                   />
+                  {df2 && parseFloat(df2) > 10000 && (
+                    <p className="text-red-600 text-sm mt-1 font-semibold">⚠️ Cannot exceed 10000!</p>
+                  )}
                 </div>
               </div>
             </>
@@ -669,6 +694,9 @@ export default function PValueCalculatorContent() {
                     placeholder="e.g., 3"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-600 text-gray-800 bg-white"
                   />
+                  {chiDf && parseFloat(chiDf) > 10000 && (
+                    <p className="text-red-600 text-sm mt-1 font-semibold">⚠️ Cannot exceed 10000!</p>
+                  )}
                 </div>
               </div>
             </>
@@ -699,6 +727,9 @@ export default function PValueCalculatorContent() {
                       placeholder="e.g., 18"
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-600 text-gray-800 bg-white"
                     />
+                    {df && parseFloat(df) > 10000 && (
+                      <p className="text-red-600 text-sm mt-1 font-semibold">⚠️ Cannot exceed 10000!</p>
+                    )}
                   </div>
                 )}
               </div>
