@@ -81,7 +81,7 @@ export default function PValueCalculatorPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-2">
-            📊 P-Value Calculator
+            P-Value Calculator
           </h1>
           <p className="text-gray-600 text-lg mb-2">
             High-Precision Statistical Significance Calculator with 9 Decimal Places Accuracy

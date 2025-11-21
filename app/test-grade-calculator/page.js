@@ -100,7 +100,7 @@ export default function TestGradeCalculatorPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-2">
-            📊 Test Grade Calculator
+            Test Grade Calculator
           </h1>
           <p className="text-gray-600 text-lg mb-2">
             Calculate your test score and letter grade with customizable grading scale

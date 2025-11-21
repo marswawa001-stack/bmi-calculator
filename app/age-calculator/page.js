@@ -23,7 +23,7 @@ export default function AgeCalculatorPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-2">
-            🎂 Age Calculator
+            Age Calculator
           </h1>
             <p className="text-gray-600 text-lg mb-2">
               The Age Calculator can determine the age or interval between two dates. The calculated age will be displayed in years, months, weeks, days, hours, minutes, and seconds.
