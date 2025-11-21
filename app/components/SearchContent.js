@@ -19,6 +19,20 @@ const allCalculators = [
     description: 'Calculate your exact age in years, months, and days',
     path: '/age-calculator'
   },
+  {
+    id: 'p-value-calculator',
+    name: 'P-Value Calculator',
+    category: 'Statistics',
+    description: 'Calculate p-values for statistical hypothesis testing',
+    path: '/p-value-calculator'
+  },
+  {
+    id: 'test-grade-calculator',
+    name: 'Test Grade Calculator',
+    category: 'Other',
+    description: 'Calculate your test score and letter grade with customizable grading scale',
+    path: '/test-grade-calculator'
+  },
 ];
 
 export default function SearchContent() {

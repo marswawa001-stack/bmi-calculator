@@ -150,9 +150,9 @@ export default function Footer() {
   return (
     <footer className="bg-gray-900 text-gray-300 border-t border-gray-800">
       {/* 主要内容区域 */}
-      <div className="max-w-7xl mx-auto px-4 py-12 pb-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-          {/* 第1列 - 品牌区域 */}
+      <div className="max-w-7xl mx-auto px-4 py-12 pb-4">
+        <div className="space-y-3">
+          {/* 品牌区域 */}
           <div className="text-center">
             <div className="mb-6">
               <div className="flex items-center justify-center gap-2 mb-3">
@@ -167,9 +167,47 @@ export default function Footer() {
                 Count on us for all.
               </p>
             </div>
-            
+          </div>
+
+          {/* 分类导航 - 流式标签布局 */}
+          <div className="text-center">
+            <h4 className="inline-block bg-pink-500 text-white font-bold text-sm px-2.5 py-0.5 rounded-full mb-3">Categories</h4>
+            <div className="flex flex-wrap justify-center gap-2 max-w-2xl mx-auto">
+              {categories.map((category) => (
+                <Link
+                  key={category.id}
+                  href={`/${category.id}`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-indigo-500 transition-colors text-xs border border-gray-700"
+                >
+                  <span className={`${category.color}`}>
+                    {category.icon}
+                  </span>
+                  <span>{category.name}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* About 和 Legal - 一字排开 */}
+          <div className="text-center">
+            <h4 className="inline-block bg-purple-500 text-white font-bold text-sm px-2.5 py-0.5 rounded-full mb-2">Resources</h4>
+            <div className="flex flex-wrap justify-center gap-2 max-w-2xl mx-auto mt-1">
+              <Link href="/about" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-indigo-500 transition-colors text-xs border border-gray-700">
+                About Me
+              </Link>
+              <Link href="/contact" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-indigo-500 transition-colors text-xs border border-gray-700">
+                Contact
+              </Link>
+              <Link href="/privacy-policy" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-indigo-500 transition-colors text-xs border border-gray-700">
+                Privacy Policy
+              </Link>
+              <Link href="/terms-of-use" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-indigo-500 transition-colors text-xs border border-gray-700">
+                Terms of Use
+              </Link>
+            </div>
+
             {/* 社交媒体图标 */}
-            <div className="flex justify-center gap-3 mt-6">
+            <div className="flex justify-center gap-3 mt-4">
               <a href="https://www.facebook.com/CalculatorVast" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-indigo-500 transition-colors" aria-label="Facebook">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
@@ -187,64 +225,11 @@ export default function Footer() {
               </a>
             </div>
           </div>
-
-          {/* 第2列 - 分类导航 */}
-          <div>
-            <h4 className="text-white font-bold text-lg mb-6">Categories</h4>
-            <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-              {categories.map((category) => (
-                <Link
-                  key={category.id}
-                  href={`/${category.id}`}
-                  className="flex items-center gap-2 text-gray-400 hover:text-indigo-500 transition-colors text-sm"
-                >
-                  <span className={`${category.color}`}>
-                    {category.icon}
-                  </span>
-                  <span className="truncate">{category.name}</span>
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          {/* 第3列 - 链接 */}
-          <div className="grid grid-cols-2 gap-6">
-            <div>
-              <h4 className="text-white font-bold text-lg mb-6">About</h4>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="/about" className="text-gray-400 hover:text-indigo-500 transition-colors text-sm">
-                    About Me
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/contact" className="text-gray-400 hover:text-indigo-500 transition-colors text-sm">
-                    Contact
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-bold text-lg mb-6">Legal</h4>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="/privacy-policy" className="text-gray-400 hover:text-indigo-500 transition-colors text-sm">
-                    Privacy Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/terms-of-use" className="text-gray-400 hover:text-indigo-500 transition-colors text-sm">
-                    Terms of Use
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
         </div>
       </div>
 
       {/* 底部栏 */}
-      <div className="max-w-7xl mx-auto px-4 py-3 border-t border-gray-800">
+      <div className="max-w-7xl mx-auto px-4 py-2 border-t border-gray-800">
         <div className="flex flex-col md:flex-row justify-center items-center gap-4">
           <p className="text-center text-xs md:text-sm text-gray-500">&copy; 2025 CalculatorVast. All rights reserved.</p>
         </div>

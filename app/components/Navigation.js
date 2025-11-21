@@ -33,7 +33,18 @@ export default function Navigation() {
       category: 'Health',
       path: '/age-calculator'
     },
-    // 可以添加更多计算器
+    {
+      id: 'p-value-calculator',
+      name: 'P-Value Calculator',
+      category: 'Statistics',
+      path: '/p-value-calculator'
+    },
+    {
+      id: 'test-grade-calculator',
+      name: 'Test Grade Calculator',
+      category: 'Other',
+      path: '/test-grade-calculator'
+    },
   ];
 
   const categories = [

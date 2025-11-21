@@ -577,8 +577,22 @@ export default function AgeCalculatorContent() {
   };
 
   const renderDateInput = (dateStr, setDate, selection, setSelection, dateType = 'start') => {
+    const nativeInputRef = useRef(null);
+
     const handleGroupClick = (group) => {
       setSelection({ group, cursorPos: 0 });
+      // 在移动设备上触发隐藏的原生输入框来唤醒键盘
+      if (nativeInputRef.current && /iPhone|iPad|Android/i.test(navigator.userAgent)) {
+        setTimeout(() => nativeInputRef.current?.click(), 50);
+      }
+    };
+
+    const handleNativeDateChange = (e) => {
+      const value = e.target.value; // yyyy-mm-dd
+      if (value) {
+        const [year, month, day] = value.split('-');
+        setDate(`${month}/${day}/${year}`);
+      }
     };
 
     const handleKeyDown = (e) => {
@@ -643,8 +657,28 @@ export default function AgeCalculatorContent() {
     const isValid = dateStr !== 'mm/dd/yyyy' && validateDate(dateStr);
     const isInvalid = dateStr !== 'mm/dd/yyyy' && !validateDate(dateStr);
 
+    // 为了兼容 HTML date input 的 YYYY-MM-DD 格式
+    const getNativeDateValue = () => {
+      if (dateStr === 'mm/dd/yyyy') return '';
+      const parts = dateStr.split('/');
+      if (parts.length === 3 && parts[0] !== 'm' && parts[1] !== 'd' && parts[2] !== 'y') {
+        return `${parts[2]}-${parts[0]}-${parts[1]}`;
+      }
+      return '';
+    };
+
     return (
       <>
+        {/* 隐藏的原生日期输入框，用于在移动设备上唤醒键盘 */}
+        <input
+          ref={nativeInputRef}
+          type="date"
+          value={getNativeDateValue()}
+          onChange={handleNativeDateChange}
+          style={{ display: 'none' }}
+          aria-hidden="true"
+        />
+        
         <div>
           <div className={`flex items-center gap-1.5 p-2.5 border-2 rounded-lg transition-all min-w-[240px] ${
             isValid 
@@ -745,9 +779,26 @@ export default function AgeCalculatorContent() {
   };
 
   const renderTimeInput = (time, setTime, selection, setSelection, disabled = false) => {
+    const nativeInputRef = useRef(null);
+
     const handleGroupClick = (group) => {
       if (disabled) return;
       setSelection({ group, cursorPos: 0 });
+      // 在移动设备上触发隐藏的原生输入框来唤醒键盘
+      if (nativeInputRef.current && /iPhone|iPad|Android/i.test(navigator.userAgent)) {
+        setTimeout(() => nativeInputRef.current?.click(), 50);
+      }
+    };
+
+    const handleNativeTimeChange = (e) => {
+      const value = e.target.value; // HH:mm (24小时制)
+      if (value) {
+        const [hours24, minutes] = value.split(':').map(Number);
+        // 转换为12小时制
+        const period = hours24 >= 12 ? 'PM' : 'AM';
+        const hours12 = hours24 % 12 || 12;
+        setTime(`${String(hours12).padStart(2, '0')}:${String(minutes).padStart(2, '0')} ${period}`);
+      }
     };
 
     const handleBlur = () => {
@@ -805,72 +856,103 @@ export default function AgeCalculatorContent() {
     const minutes = time.substring(3, 5);
     const ampm = time.substring(6, 8);
 
+    // 为了兼容 HTML time input 的 HH:mm 格式（24小时制）
+    const getNativeTimeValue = () => {
+      if (time === 'hh:mm aa') return '';
+      const match = time.match(/(\d{1,2}):(\d{2})\s*(AM|PM|am|pm)/);
+      if (match) {
+        let hours24 = parseInt(match[1]);
+        const min = match[2];
+        const period = match[3].toUpperCase();
+        if (period === 'PM' && hours24 !== 12) {
+          hours24 += 12;
+        } else if (period === 'AM' && hours24 === 12) {
+          hours24 = 0;
+        }
+        return `${String(hours24).padStart(2, '0')}:${min}`;
+      }
+      return '';
+    };
+
     return (
-      <div className={`flex items-center gap-1.5 p-2.5 border-2 rounded-lg min-w-[200px] transition-colors ${
-        disabled 
-          ? 'border-gray-300 bg-gray-50' 
-          : 'border-blue-300 bg-blue-50'
-      }`}>
-          {/* Hour Group */}
-          <button
-            onClick={() => handleGroupClick('hh')}
-            onKeyDown={handleKeyDown}
-            onBlur={handleBlur}
-            disabled={disabled}
-            className={`px-2.5 py-1 rounded font-mono font-bold text-base tracking-wider transition-colors border w-12 ${
-              disabled
-                ? 'bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed'
-                : selection.group === 'hh'
-                ? 'bg-blue-600 text-white border-blue-600'
-                : 'bg-white text-gray-700 border-blue-200 hover:bg-blue-100'
-            }`}
-            tabIndex={disabled || selection.group !== 'hh' ? -1 : 0}
-          >
-            {hours}
-          </button>
+      <>
+        {/* 隐藏的原生时间输入框，用于在移动设备上唤醒键盘 */}
+        <input
+          ref={nativeInputRef}
+          type="time"
+          value={getNativeTimeValue()}
+          onChange={handleNativeTimeChange}
+          style={{ display: 'none' }}
+          aria-hidden="true"
+          disabled={disabled}
+        />
 
-          {/* Colon */}
-          <span className={`font-bold ${disabled ? 'text-gray-400' : 'text-blue-400'}`}>:</span>
+        <div className={`flex items-center gap-1.5 p-2.5 border-2 rounded-lg min-w-[200px] transition-colors ${
+          disabled 
+            ? 'border-gray-300 bg-gray-50' 
+            : 'border-blue-300 bg-blue-50'
+        }`}>
+            {/* Hour Group */}
+            <button
+              onClick={() => handleGroupClick('hh')}
+              onKeyDown={handleKeyDown}
+              onBlur={handleBlur}
+              disabled={disabled}
+              className={`px-2.5 py-1 rounded font-mono font-bold text-base tracking-wider transition-colors border w-12 ${
+                disabled
+                  ? 'bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed'
+                  : selection.group === 'hh'
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-white text-gray-700 border-blue-200 hover:bg-blue-100'
+              }`}
+              tabIndex={disabled || selection.group !== 'hh' ? -1 : 0}
+            >
+              {hours}
+            </button>
 
-          {/* Minute Group */}
-          <button
-            onClick={() => handleGroupClick('mm')}
-            onKeyDown={handleKeyDown}
-            onBlur={handleBlur}
-            disabled={disabled}
-            className={`px-2.5 py-1 rounded font-mono font-bold text-base tracking-wider transition-colors border w-12 ${
-              disabled
-                ? 'bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed'
-                : selection.group === 'mm'
-                ? 'bg-blue-600 text-white border-blue-600'
-                : 'bg-white text-gray-700 border-blue-200 hover:bg-blue-100'
-            }`}
-            tabIndex={disabled || selection.group !== 'mm' ? -1 : 0}
-          >
-            {minutes}
-          </button>
+            {/* Colon */}
+            <span className={`font-bold ${disabled ? 'text-gray-400' : 'text-blue-400'}`}>:</span>
 
-          {/* Divider */}
-          <span className={disabled ? 'text-gray-400' : 'text-blue-400'}>|</span>
+            {/* Minute Group */}
+            <button
+              onClick={() => handleGroupClick('mm')}
+              onKeyDown={handleKeyDown}
+              onBlur={handleBlur}
+              disabled={disabled}
+              className={`px-2.5 py-1 rounded font-mono font-bold text-base tracking-wider transition-colors border w-12 ${
+                disabled
+                  ? 'bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed'
+                  : selection.group === 'mm'
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-white text-gray-700 border-blue-200 hover:bg-blue-100'
+              }`}
+              tabIndex={disabled || selection.group !== 'mm' ? -1 : 0}
+            >
+              {minutes}
+            </button>
 
-          {/* AM/PM Group */}
-          <button
-            onClick={() => handleGroupClick('aa')}
-            onKeyDown={handleKeyDown}
-            onBlur={handleBlur}
-            disabled={disabled}
-            className={`px-2.5 py-1 rounded font-mono font-bold text-base tracking-wider transition-colors border w-12 ${
-              disabled
-                ? 'bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed'
-                : selection.group === 'aa'
-                ? 'bg-blue-600 text-white border-blue-600'
-                : 'bg-white text-gray-700 border-blue-200 hover:bg-blue-100'
-            }`}
-            tabIndex={disabled || selection.group !== 'aa' ? -1 : 0}
-          >
-            {ampm}
-          </button>
-        </div>
+            {/* Divider */}
+            <span className={disabled ? 'text-gray-400' : 'text-blue-400'}>|</span>
+
+            {/* AM/PM Group */}
+            <button
+              onClick={() => handleGroupClick('aa')}
+              onKeyDown={handleKeyDown}
+              onBlur={handleBlur}
+              disabled={disabled}
+              className={`px-2.5 py-1 rounded font-mono font-bold text-base tracking-wider transition-colors border w-12 ${
+                disabled
+                  ? 'bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed'
+                  : selection.group === 'aa'
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-white text-gray-700 border-blue-200 hover:bg-blue-100'
+              }`}
+              tabIndex={disabled || selection.group !== 'aa' ? -1 : 0}
+            >
+              {ampm}
+            </button>
+          </div>
+      </>
     );
   };
 
