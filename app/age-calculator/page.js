@@ -31,10 +31,15 @@ export default function AgeCalculatorPage() {
             <p className="text-gray-500 text-sm">
               Free, accurate, and instant results with multiple time interval formats
             </p>
+            <div className="mt-3">
+              <span className="inline-block bg-purple-600 text-white text-xs px-3 py-1 rounded-full">
+                Last updated: November 21, 2025
+              </span>
+            </div>
           </div>
 
         {/* Creator Card */}
-        <CreatorCard showSources={false} />
+        <CreatorCard calculatorName="Age Calculator" showSources={false} />
 
         {/* Calculator Content */}
         <AgeCalculatorContent />

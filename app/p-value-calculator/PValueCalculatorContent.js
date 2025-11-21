@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import FeedbackButton from '../components/FeedbackButton';
 
 // Statistical distribution functions
 const erf = (x) => {
@@ -211,7 +210,7 @@ const fDistributionCDF = (f, df1, df2) => {
 };
 
 export default function PValueCalculatorContent() {
-  const [testType, setTestType] = useState('t-test');
+  const [testType, setTestType] = useState('z-test');
   const [tailType, setTailType] = useState('two-tailed');
   const [chiTailType, setChiTailType] = useState('right-tailed'); // For chi-square
   const [alpha, setAlpha] = useState(0.05);
@@ -246,6 +245,29 @@ export default function PValueCalculatorContent() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tailType, chiTailType]);
+  
+  // Auto-calculate when inputs change
+  useEffect(() => {
+    const canCalculate = () => {
+      if (testType === 'chi-square') {
+        return chiSquare && chiDf && validateInput(chiSquare) && validateInput(chiDf);
+      } else if (testType === 't-test') {
+        return statistic && df && validateInput(statistic) && validateInput(df);
+      } else if (testType === 'z-test') {
+        return statistic && validateInput(statistic);
+      } else if (testType === 'f-test') {
+        return fStatistic && df1 && df2 && validateInput(fStatistic) && validateInput(df1) && validateInput(df2);
+      }
+      return false;
+    };
+    
+    if (canCalculate()) {
+      calculatePValue();
+    } else {
+      setResult(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [testType, statistic, df, fStatistic, df1, df2, chiSquare, chiDf]);
   
   const calculatePValue = () => {
     setError('');
@@ -585,7 +607,7 @@ export default function PValueCalculatorContent() {
               <div className="grid md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    F-Statistic (F-Ratio)
+                    Your F-score
                   </label>
                   <input
                     type="number"
@@ -597,7 +619,7 @@ export default function PValueCalculatorContent() {
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    DF1 (Numerator)
+                    Numerator degrees of freedom (d₁)
                   </label>
                   <input
                     type="number"
@@ -609,7 +631,7 @@ export default function PValueCalculatorContent() {
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    DF2 (Denominator)
+                    Denominator degrees of freedom (d₂)
                   </label>
                   <input
                     type="number"
@@ -626,7 +648,7 @@ export default function PValueCalculatorContent() {
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Chi-Square Statistic (χ²)
+                    Your χ²-score
                   </label>
                   <input
                     type="number"
@@ -655,7 +677,7 @@ export default function PValueCalculatorContent() {
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    {testType === 't-test' ? 't-Statistic' : 'z-Statistic'}
+                    {testType === 't-test' ? 'Your t-score' : 'Your Z-score'}
                   </label>
                   <input
                     type="number"
@@ -692,27 +714,13 @@ export default function PValueCalculatorContent() {
         )}
         
         {/* Buttons */}
-        <div className="flex gap-4">
-          <button
-            onClick={calculatePValue}
-            disabled={isCalculateDisabled()}
-            className={`flex-1 font-bold py-3 px-6 rounded-lg transition ${
-              isCalculateDisabled()
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-blue-500 hover:bg-blue-600 text-white'
-            }`}
-          >
-            Calculate P-Value
-          </button>
+        <div className="flex justify-center">
           <button
             onClick={resetCalculator}
-            className="flex-1 bg-gray-400 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-lg transition"
+            className="bg-gray-400 hover:bg-gray-500 text-white font-bold py-3 px-8 rounded-lg transition"
           >
-            Reset
+            Clear all changes
           </button>
-        </div>
-        <div className="flex justify-center mt-6">
-          <FeedbackButton calculatorName="P-Value Calculator" />
         </div>
       </div>
       

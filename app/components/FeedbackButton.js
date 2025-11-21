@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-export default function FeedbackButton({ calculatorName = 'Calculator' }) {
+export default function FeedbackButton({ calculatorName = 'Calculator', isOpen = null, onClose = null }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentUrl, setCurrentUrl] = useState('');
   const [formData, setFormData] = useState({
@@ -18,6 +18,17 @@ export default function FeedbackButton({ calculatorName = 'Calculator' }) {
   useEffect(() => {
     setCurrentUrl(window.location.href);
   }, []);
+
+  // Support controlled mode (when used from CreatorCard)
+  const modalOpen = isOpen !== null ? isOpen : isModalOpen;
+  const setModalOpen = (value) => {
+    if (onClose && !value) {
+      onClose();
+    }
+    if (isOpen === null) {
+      setIsModalOpen(value);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -48,7 +59,7 @@ export default function FeedbackButton({ calculatorName = 'Calculator' }) {
         setSubmitStatus('success');
         setFormData({ name: '', email: '', type: 'feedback', message: '' });
         setTimeout(() => {
-          setIsModalOpen(false);
+          setModalOpen(false);
           setSubmitStatus(null);
         }, 2000);
       } else {
@@ -61,6 +72,114 @@ export default function FeedbackButton({ calculatorName = 'Calculator' }) {
     }
   };
 
+  // If used in controlled mode (from CreatorCard), only render modal
+  if (isOpen !== null) {
+    return (
+      <>
+        {modalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={() => setModalOpen(false)}>
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+              {/* Modal Header */}
+              <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex justify-between items-center">
+                <h2 className="text-xl font-bold text-gray-800">Send Feedback</h2>
+                <button
+                  onClick={() => setModalOpen(false)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Modal Content */}
+              <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Name (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    placeholder="Your name"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Email (Optional)
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    placeholder="your.email@example.com"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Type
+                  </label>
+                  <select
+                    name="type"
+                    value={formData.type}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+                  >
+                    <option value="feedback">💬 Feedback</option>
+                    <option value="bug">🐛 Bug Report</option>
+                    <option value="suggestion">💡 Suggestion</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Message *
+                  </label>
+                  <textarea
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    required
+                    rows={4}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 resize-none"
+                    placeholder="Tell us what you think..."
+                  />
+                </div>
+
+                {submitStatus === 'success' && (
+                  <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
+                    ✅ Thank you! Your feedback has been sent successfully.
+                  </div>
+                )}
+
+                {submitStatus === 'error' && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                    ❌ Something went wrong. Please try again.
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? 'Sending...' : 'Send Feedback'}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+      </>
+    );
+  }
+
   return (
     <>
       {/* Feedback Section */}
@@ -72,7 +191,7 @@ export default function FeedbackButton({ calculatorName = 'Calculator' }) {
         
         {/* Feedback Button - Icon Only */}
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => setModalOpen(true)}
           className="inline-flex items-center justify-center text-pink-600 hover:text-pink-700 transition-colors duration-200"
           title="Send us your feedback, bug reports, or suggestions"
         >
@@ -91,14 +210,14 @@ export default function FeedbackButton({ calculatorName = 'Calculator' }) {
           </svg>
         </button>
       </div>      {/* Modal */}
-      {isModalOpen && (
+      {modalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex justify-between items-center">
               <h2 className="text-xl font-bold text-gray-800">Send Feedback</h2>
               <button
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => setModalOpen(false)}
                 className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
               >
                 ×

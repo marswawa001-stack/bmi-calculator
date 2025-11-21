@@ -108,10 +108,15 @@ export default function TestGradeCalculatorPage() {
           <p className="text-gray-500 text-sm">
             Free, accurate, instant results - Perfect for students and teachers
           </p>
+          <div className="mt-3">
+            <span className="inline-block bg-blue-600 text-white text-xs px-3 py-1 rounded-full">
+              Last updated: November 21, 2025
+            </span>
+          </div>
         </div>
 
         {/* Creator Card */}
-        <CreatorCard customReferences={testGradeReferences} />
+        <CreatorCard calculatorName="Test Grade Calculator" customReferences={testGradeReferences} />
 
         {/* Calculator Content */}
         <TestGradeCalculatorContent />

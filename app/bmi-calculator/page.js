@@ -52,10 +52,15 @@ export default function BMICalculatorPage() {
           <p className="text-gray-500 text-sm">
             Free, accurate, and instant results with personalized health recommendations
           </p>
+          <div className="mt-3">
+            <span className="inline-block bg-indigo-600 text-white text-xs px-3 py-1 rounded-full">
+              Last updated: November 21, 2025
+            </span>
+          </div>
         </div>
 
         {/* Creator Card */}
-        <CreatorCard />
+        <CreatorCard calculatorName="BMI Calculator" />
 
         {/* Calculator Content */}
         <BMICalculatorContent />

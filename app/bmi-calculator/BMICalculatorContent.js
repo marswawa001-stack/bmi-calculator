@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import FeedbackButton from '../components/FeedbackButton';
 
 export default function BMICalculatorContent() {
   const [weight, setWeight] = useState('');
@@ -19,6 +18,13 @@ export default function BMICalculatorContent() {
       setHistory(JSON.parse(saved));
     }
   }, []);
+
+  // Auto-calculate when inputs are valid
+  useEffect(() => {
+    if (isCalculateEnabled()) {
+      calculateBMI();
+    }
+  }, [weight, height, unit]);
 
   const convertToMetric = (w, h, isMetric) => {
     if (isMetric) {
@@ -48,10 +54,11 @@ export default function BMICalculatorContent() {
     
     const weightValue = parseFloat(val);
     const isMetric = unit === 'metric';
+    const minWeight = isMetric ? 10 : 22; // kg or lb (includes children)
     const maxWeight = isMetric ? 500 : 1100; // kg or lb
     
-    if (weightValue > maxWeight) {
-      return { valid: false, error: `Must be between 0.1 and ${maxWeight} ${isMetric ? 'kg' : 'lb'}` };
+    if (weightValue < minWeight || weightValue > maxWeight) {
+      return { valid: false, error: `Must be between ${minWeight} and ${maxWeight} ${isMetric ? 'kg' : 'lb'}` };
     }
     return { valid: true, error: '' };
   };
@@ -63,10 +70,11 @@ export default function BMICalculatorContent() {
     
     const heightValue = parseFloat(val);
     const isMetric = unit === 'metric';
+    const minHeight = isMetric ? 30 : 0.98; // cm or ft (includes young children)
     const maxHeight = isMetric ? 300 : 9.84; // cm or ft
     
-    if (heightValue > maxHeight) {
-      return { valid: false, error: `Must be between 0.1 and ${maxHeight} ${isMetric ? 'cm' : 'ft'}` };
+    if (heightValue < minHeight || heightValue > maxHeight) {
+      return { valid: false, error: `Must be between ${minHeight} and ${maxHeight} ${isMetric ? 'cm' : 'ft'}` };
     }
     return { valid: true, error: '' };
   };
@@ -224,28 +232,53 @@ export default function BMICalculatorContent() {
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Weight ({unit === 'metric' ? 'kg' : 'lb'})
             </label>
-            <input
-              type="text"
-              value={weight}
-              onChange={(e) => {
-                const val = e.target.value;
-                setWeight(val);
-                
-                if (val === '') {
-                  setWeightError('');
-                } else {
-                  const validation = validateWeight(val);
-                  setWeightError(validation.error);
-                }
-              }}
-              onKeyPress={(e) => e.key === 'Enter' && isCalculateEnabled() && calculateBMI()}
-              placeholder={unit === 'metric' ? 'e.g., 70' : 'e.g., 154'}
-              className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors text-lg text-gray-900 ${
-                weightError ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-indigo-500'
-              }`}
-            />
-            {weightError && <p className="text-xs text-red-600 mt-1">⚠️ {weightError}</p>}
-            <p className="text-xs text-gray-500 mt-1">Valid range: 0.1 - {unit === 'metric' ? '500 kg' : '1100 lb'}</p>
+            <div className="relative">
+              <input
+                type="text"
+                value={weight}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setWeight(val);
+                  
+                  if (val === '') {
+                    setWeightError('');
+                    setResult(null);
+                  } else {
+                    const validation = validateWeight(val);
+                    setWeightError(validation.error);
+                  }
+                }}
+                onKeyPress={(e) => e.key === 'Enter' && isCalculateEnabled() && calculateBMI()}
+                placeholder={unit === 'metric' ? 'e.g., 70' : 'e.g., 154'}
+                className={`w-full px-4 py-3 pr-10 border-2 rounded-lg focus:outline-none transition-colors text-lg text-gray-900 ${
+                  weightError ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-indigo-500'
+                }`}
+              />
+              {weight && (
+                <button
+                  onClick={() => {
+                    setWeight('');
+                    setWeightError('');
+                    setResult(null);
+                  }}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  type="button"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
+            {/* Fixed height container for error message */}
+            <div className="h-5 mt-1">
+              <p className={`text-xs text-red-600 transition-opacity duration-200 ${
+                weightError ? 'opacity-100' : 'opacity-0'
+              }`}>
+                {weightError ? `⚠️ ${weightError}` : ' '}
+              </p>
+            </div>
+            <p className="text-xs text-gray-500">Valid range: {unit === 'metric' ? '10 - 500 kg' : '22 - 1100 lb'}</p>
           </div>
 
           {/* Height Input */}
@@ -253,55 +286,63 @@ export default function BMICalculatorContent() {
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Height ({unit === 'metric' ? 'cm' : 'ft'})
             </label>
-            <input
-              type="text"
-              value={height}
-              onChange={(e) => {
-                const val = e.target.value;
-                setHeight(val);
-                
-                if (val === '') {
-                  setHeightError('');
-                } else {
-                  const validation = validateHeight(val);
-                  setHeightError(validation.error);
-                }
-              }}
-              onKeyPress={(e) => e.key === 'Enter' && isCalculateEnabled() && calculateBMI()}
-              placeholder={unit === 'metric' ? 'e.g., 170' : 'e.g., 5.58'}
-              className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors text-lg text-gray-900 ${
-                heightError ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-indigo-500'
-              }`}
-            />
-            {heightError && <p className="text-xs text-red-600 mt-1">⚠️ {heightError}</p>}
-            <p className="text-xs text-gray-500 mt-1">Valid range: 0.1 - {unit === 'metric' ? '300 cm' : '9.84 ft'}</p>
+            <div className="relative">
+              <input
+                type="text"
+                value={height}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setHeight(val);
+                  
+                  if (val === '') {
+                    setHeightError('');
+                    setResult(null);
+                  } else {
+                    const validation = validateHeight(val);
+                    setHeightError(validation.error);
+                  }
+                }}
+                onKeyPress={(e) => e.key === 'Enter' && isCalculateEnabled() && calculateBMI()}
+                placeholder={unit === 'metric' ? 'e.g., 170' : 'e.g., 5.58'}
+                className={`w-full px-4 py-3 pr-10 border-2 rounded-lg focus:outline-none transition-colors text-lg text-gray-900 ${
+                  heightError ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-indigo-500'
+                }`}
+              />
+              {height && (
+                <button
+                  onClick={() => {
+                    setHeight('');
+                    setHeightError('');
+                    setResult(null);
+                  }}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  type="button"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
+            {/* Fixed height container for error message */}
+            <div className="h-5 mt-1">
+              <p className={`text-xs text-red-600 transition-opacity duration-200 ${
+                heightError ? 'opacity-100' : 'opacity-0'
+              }`}>
+                {heightError ? `⚠️ ${heightError}` : ' '}
+              </p>
+            </div>
+            <p className="text-xs text-gray-500">Valid range: {unit === 'metric' ? '30 - 300 cm' : '0.98 - 9.84 ft'}</p>
           </div>
 
-          {/* Buttons */}
-          <div className="flex gap-4">
-            <button
-              onClick={calculateBMI}
-              disabled={!isCalculateEnabled()}
-              className={`flex-1 font-bold py-4 px-6 rounded-lg transition-colors duration-200 shadow-lg ${
-                isCalculateEnabled()
-                  ? 'bg-indigo-600 hover:bg-indigo-700 text-white hover:shadow-xl cursor-pointer'
-                  : 'bg-gray-400 text-gray-200 cursor-not-allowed opacity-60'
-              }`}
-            >
-              Calculate BMI
-            </button>
-            
+          {/* Clear Button */}
+          <div className="flex justify-center">
             <button
               onClick={resetCalculator}
-              className="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-4 px-6 rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl"
+              className="px-8 py-3 bg-gray-500 hover:bg-gray-600 text-white font-bold rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl"
             >
-              Reset
+              Clear all changes
             </button>
-          </div>
-
-          {/* Feedback Button - Centered */}
-          <div className="flex justify-center mt-6">
-            <FeedbackButton calculatorName="BMI Calculator" />
           </div>
 
           {/* Result Display */}
@@ -369,7 +410,7 @@ export default function BMICalculatorContent() {
                 
                 {/* Range Bar with Indicator Pointer */}
                 <div className="relative mt-0 pt-4">
-                  {/* BMI Indicator Pointer - Below Bar */}
+                  {/* BMI Indicator Pointer - Only show if within range */}
                   {result.bmi && (
                     (() => {
                       // Calculate position based on actual range widths
@@ -377,7 +418,13 @@ export default function BMICalculatorContent() {
                       const minValue = 15; // Minimum BMI on chart
                       const maxValue = 38; // Maximum BMI on chart
                       const bmiValue = parseFloat(result.bmi);
-                      const position = Math.min(Math.max(((bmiValue - minValue) / (maxValue - minValue)) * 100, 0), 100);
+                      
+                      // Only show indicator if within range
+                      if (bmiValue < minValue || bmiValue > maxValue) {
+                        return null;
+                      }
+                      
+                      const position = ((bmiValue - minValue) / (maxValue - minValue)) * 100;
                       
                       // Determine color based on BMI category
                       let pointerColor = '#1f2937'; // gray-800
@@ -435,6 +482,25 @@ export default function BMICalculatorContent() {
                     ))}
                   </div>
                 </div>
+                
+                {/* Out of Range Warning - Below Chart */}
+                {(() => {
+                  const bmiValue = parseFloat(result.bmi);
+                  const minValue = 15;
+                  const maxValue = 38;
+                  const isOutOfRange = bmiValue < minValue || bmiValue > maxValue;
+                  
+                  if (isOutOfRange) {
+                    return (
+                      <div className="mt-3 p-3 bg-orange-50 border-l-4 border-orange-500 rounded">
+                        <p className="text-sm text-orange-800 font-medium">
+                          ⚠️ Your BMI value ({result.bmi}) is {bmiValue < minValue ? 'below' : 'above'} the standard chart range (15-38)
+                        </p>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
               </div>
             </div>
           )}
@@ -565,11 +631,11 @@ export default function BMICalculatorContent() {
               <li><strong>Enter Your Gender (Optional):</strong> Select your gender to help personalize health recommendations.</li>
               <li><strong>Input Your Weight:</strong> Enter your weight in the selected unit.</li>
               <li><strong>Input Your Height:</strong> Enter your height in the selected unit.</li>
-              <li><strong>Calculate:</strong> Click the "Calculate BMI" button to get your result.</li>
-              <li><strong>View Results:</strong> Your BMI, category, and personalized advice will appear instantly.</li>
+              <li><strong>Auto-Calculate:</strong> Your BMI will be calculated automatically as you type valid values.</li>
+              <li><strong>View Results:</strong> Your BMI, category, and personalized advice will appear instantly below the inputs.</li>
             </ol>
             <div className="bg-indigo-50 p-4 rounded-lg border-l-4 border-indigo-600 mt-4">
-              <p className="text-sm font-semibold">💡 Pro Tip: Your calculation history is saved automatically, allowing you to track your progress over time.</p>
+              <p className="text-sm font-semibold">💡 Pro Tip: BMI is calculated automatically as you enter values. Your calculation history is saved automatically, allowing you to track your progress over time.</p>
             </div>
           </div>
         </div>

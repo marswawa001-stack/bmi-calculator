@@ -93,162 +93,308 @@ export default function PValueCalculatorPage() {
             <span className="text-purple-700 font-semibold text-sm">✨ 9 Decimal Precision</span>
             <span className="text-purple-600 text-xs">• Customizable α levels</span>
           </div>
+          <div className="mt-3">
+            <span className="inline-block bg-purple-600 text-white text-xs px-3 py-1 rounded-full">
+              Last updated: November 21, 2025
+            </span>
+          </div>
         </div>
 
         {/* Creator Card */}
-        <CreatorCard showSources={true} customReferences={pValueReferences} />
+        <CreatorCard calculatorName="P-Value Calculator" showSources={true} customReferences={pValueReferences} />
 
         {/* Calculator Content */}
         <PValueCalculatorContent />
 
-        {/* P-Value Information Section */}
-        <div className="grid md:grid-cols-2 gap-8 mb-8">
-          {/* What is P-Value */}
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              📚 Understanding P-Value
-            </h2>
-            
-            <div className="space-y-4 text-gray-700 text-sm">
+        {/* Educational Content Section */}
+        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+          <h2 className="text-3xl font-bold text-gray-800 mb-6">
+            Understanding P-Values in Statistical Testing
+          </h2>
+          
+          <div className="space-y-6 text-gray-700">
+            <section>
+              <h3 className="text-xl font-bold text-gray-800 mb-3">
+                What is a P-Value?
+              </h3>
+              <p className="mb-3">
+                In statistical hypothesis testing, the p-value serves as a crucial metric for decision-making. It quantifies the probability of observing your experimental data—or results even more unusual—when the null hypothesis holds true. Think of it as asking: "If there truly were no effect, how surprising would my data be?"
+              </p>
+              <p className="mb-3">
+                This probability calculation assumes a specific world where the null hypothesis (H₀) is correct. Lower p-values suggest your observed data would be quite unusual in that world, providing grounds to question whether the null hypothesis accurately describes reality.
+              </p>
+              <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
+                <p className="text-sm">
+                  <strong>Key Concept:</strong> The p-value measures data compatibility with the null hypothesis, not the probability that the null hypothesis is true. This distinction is fundamental to proper statistical interpretation.
+                </p>
+              </div>
+            </section>
+
+            <section>
+              <h3 className="text-xl font-bold text-gray-800 mb-3">
+                How to Calculate P-Values from Test Statistics
+              </h3>
+              <p className="mb-3">
+                The calculation process involves comparing your test statistic against its theoretical probability distribution. Each statistical test has an associated distribution:
+              </p>
+              <ul className="list-none space-y-3 mb-4">
+                <li className="flex items-start">
+                  <span className="text-purple-600 font-bold mr-2">•</span>
+                  <div>
+                    <strong>Z-Score:</strong> Uses the standard normal distribution N(0,1). Appropriate when population standard deviation is known or sample sizes exceed 30.
+                  </div>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-purple-600 font-bold mr-2">•</span>
+                  <div>
+                    <strong>T-Statistic:</strong> Follows the t-distribution with specified degrees of freedom. Essential when working with smaller samples or unknown population variance.
+                  </div>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-purple-600 font-bold mr-2">•</span>
+                  <div>
+                    <strong>Chi-Square (χ²):</strong> Applied in categorical data analysis, goodness-of-fit tests, and variance testing. Distribution shape depends on degrees of freedom.
+                  </div>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-purple-600 font-bold mr-2">•</span>
+                  <div>
+                    <strong>F-Ratio:</strong> Used for comparing variances and in ANOVA. Requires two degrees of freedom parameters (numerator and denominator).
+                  </div>
+                </li>
+              </ul>
               <p>
-                A <strong>p-value</strong> is the probability of obtaining results at least as extreme as the observed data, assuming the null hypothesis is true.
+                Our calculator handles the mathematical complexity, using cumulative distribution functions to transform your test statistic into an accurate p-value with 9 decimal precision.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="text-xl font-bold text-gray-800 mb-3">
+                Interpreting Your P-Value Results
+              </h3>
+              <p className="mb-3">
+                Interpretation requires comparing your p-value against a pre-determined significance level (α), commonly set at 0.05, though this varies by discipline:
               </p>
               
-              <div className="flex items-start">
-                <div className="w-3 h-3 bg-purple-500 rounded-full mt-1.5 mr-3 flex-shrink-0"></div>
-                <div>
-                  <strong>p &lt; 0.001:</strong> Very strong evidence against null hypothesis
+              <div className="grid md:grid-cols-2 gap-4 mb-4">
+                <div className="bg-gradient-to-br from-red-50 to-orange-50 p-4 rounded-lg border border-red-200">
+                  <h4 className="font-bold text-red-700 mb-2">When p &lt; α</h4>
+                  <p className="text-sm text-gray-700">
+                    Reject the null hypothesis. Your data provides statistically significant evidence for an effect. However, significance doesn't automatically mean practical importance.
+                  </p>
+                </div>
+                <div className="bg-gradient-to-br from-gray-50 to-slate-50 p-4 rounded-lg border border-gray-300">
+                  <h4 className="font-bold text-gray-700 mb-2">When p ≥ α</h4>
+                  <p className="text-sm text-gray-700">
+                    Fail to reject the null hypothesis. Insufficient evidence exists to claim a statistically significant effect, though this doesn't prove the null hypothesis true.
+                  </p>
                 </div>
               </div>
+
+              <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+                <p className="text-sm">
+                  <strong>⚠️ Common Pitfall:</strong> A p-value of 0.049 versus 0.051 shouldn't drastically change your conclusions. Statistical significance is not a binary concept—consider the entire context of your research, including effect sizes and confidence intervals.
+                </p>
+              </div>
+            </section>
+
+            <section>
+              <h3 className="text-xl font-bold text-gray-800 mb-3">
+                Understanding Test Directions: One-Tailed vs. Two-Tailed
+              </h3>
+              <p className="mb-3">
+                Your research question determines which test direction to use:
+              </p>
               
-              <div className="flex items-start">
-                <div className="w-3 h-3 bg-purple-500 rounded-full mt-1.5 mr-3 flex-shrink-0"></div>
-                <div>
-                  <strong>p &lt; 0.05:</strong> Commonly used significance threshold
+              <div className="space-y-3">
+                <div className="border-l-4 border-purple-400 pl-4">
+                  <strong className="text-purple-700">Two-Tailed Tests:</strong>
+                  <p className="text-sm mt-1">
+                    Detect effects in either direction. Use when you're testing for "difference" without predicting which direction. More conservative and generally preferred in scientific research.
+                  </p>
+                </div>
+                <div className="border-l-4 border-green-400 pl-4">
+                  <strong className="text-green-700">Right-Tailed Tests:</strong>
+                  <p className="text-sm mt-1">
+                    Test if your parameter is greater than the reference value. Appropriate when you have strong theoretical reasons to expect an increase.
+                  </p>
+                </div>
+                <div className="border-l-4 border-blue-400 pl-4">
+                  <strong className="text-blue-700">Left-Tailed Tests:</strong>
+                  <p className="text-sm mt-1">
+                    Test if your parameter is less than the reference value. Use when expecting a decrease based on prior knowledge or theory.
+                  </p>
                 </div>
               </div>
+
+              <p className="mt-3 text-sm italic">
+                Note: One-tailed tests yield smaller p-values (more likely to reach significance) but require justification. Choose your test direction before seeing the data to avoid bias.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="text-xl font-bold text-gray-800 mb-3">
+                Using This P-Value Calculator
+              </h3>
+              <p className="mb-3">
+                Follow these steps for accurate results:
+              </p>
+              <ol className="list-decimal list-inside space-y-2 mb-3">
+                <li>Select your statistical test type (z, t, chi-square, or F)</li>
+                <li>Choose the appropriate test direction (two-tailed, left-tailed, or right-tailed)</li>
+                <li>Set your significance level α (typically 0.05)</li>
+                <li>Enter your calculated test statistic and degrees of freedom</li>
+                <li>Click "Calculate P-Value" to obtain results with 9-decimal precision</li>
+              </ol>
+              <p>
+                The calculator automatically compares your p-value to α and provides a statistical decision recommendation, along with an interpretation of the evidence strength.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="text-xl font-bold text-gray-800 mb-3">
+                Practical Examples by Test Type
+              </h3>
               
-              <div className="flex items-start">
-                <div className="w-3 h-3 bg-purple-500 rounded-full mt-1.5 mr-3 flex-shrink-0"></div>
-                <div>
-                  <strong>p &gt; 0.1:</strong> Insufficient evidence to reject null hypothesis
+              <div className="space-y-4">
+                <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-4 rounded-lg">
+                  <h4 className="font-bold text-blue-800 mb-2">Z-Test Example</h4>
+                  <p className="text-sm text-gray-700 mb-2">
+                    A pharmaceutical company tests whether a new drug lowers blood pressure. With a sample of 100 patients, they calculate z = -2.58. Using a two-tailed test at α = 0.05:
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Input: z-statistic = -2.58 → p-value ≈ 0.00988. Since p &lt; 0.05, the drug shows statistically significant effect.
+                  </p>
+                </div>
+
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg">
+                  <h4 className="font-bold text-green-800 mb-2">T-Test Example</h4>
+                  <p className="text-sm text-gray-700 mb-2">
+                    Researchers compare test scores between two teaching methods (15 students each). They obtain t = 2.14 with df = 28. Using a two-tailed test:
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Input: t = 2.14, df = 28 → p-value ≈ 0.0412. Significant at α = 0.05 level, suggesting the teaching methods differ.
+                  </p>
+                </div>
+
+                <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg">
+                  <h4 className="font-bold text-purple-800 mb-2">Chi-Square Example</h4>
+                  <p className="text-sm text-gray-700 mb-2">
+                    Testing whether observed categorical frequencies match expected distributions. With χ² = 7.815 and df = 3:
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Input: χ² = 7.815, df = 3 (right-tailed) → p-value ≈ 0.0499. Borderline significant, suggesting deviation from expected distribution.
+                  </p>
+                </div>
+
+                <div className="bg-gradient-to-r from-orange-50 to-red-50 p-4 rounded-lg">
+                  <h4 className="font-bold text-orange-800 mb-2">F-Test Example</h4>
+                  <p className="text-sm text-gray-700 mb-2">
+                    ANOVA comparing three diet groups. With F = 3.89, df1 = 2, df2 = 27:
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Input: F = 3.89, df1 = 2, df2 = 27 (right-tailed) → p-value ≈ 0.0328. Significant difference exists among the diet groups.
+                  </p>
                 </div>
               </div>
-            </div>
-
-            <div className="mt-6 p-4 bg-purple-50 border-l-4 border-purple-400 rounded">
-              <p className="text-sm text-gray-700">
-                <strong>💡 Important:</strong> P-value does NOT represent the probability that the null hypothesis is true. It measures the strength of evidence against it.
-              </p>
-            </div>
-          </div>
-
-          {/* Supported Tests */}
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              🧪 Supported Tests
-            </h2>
-            
-            <div className="space-y-4">
-              <div>
-                <strong className="text-purple-600">z-Test</strong>
-                <p className="text-sm text-gray-700 mt-1">Test hypotheses about population means with known standard deviation.</p>
-              </div>
-              
-              <div>
-                <strong className="text-purple-600">t-Test</strong>
-                <p className="text-sm text-gray-700 mt-1">Compare means between two groups or one group vs. a known value.</p>
-              </div>
-              
-              <div>
-                <strong className="text-purple-600">Chi-Square Test</strong>
-                <p className="text-sm text-gray-700 mt-1">Assess independence or goodness-of-fit for categorical data. Supports left-tailed, right-tailed, and two-tailed tests.</p>
-              </div>
-              
-              <div>
-                <strong className="text-purple-600">F-Test (F-Ratio)</strong>
-                <p className="text-sm text-gray-700 mt-1">Compare variances between two groups. Used in ANOVA and regression analysis.</p>
-              </div>
-
-              <div>
-                <strong className="text-purple-600">One-Tailed & Two-Tailed</strong>
-                <p className="text-sm text-gray-700 mt-1">Directional or non-directional hypothesis testing. All tests support two-tailed, left-tailed, and right-tailed options.</p>
-              </div>
-            </div>
-
-            <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-300 rounded-lg">
-              <p className="text-sm font-semibold text-purple-800 mb-2">
-                ⚡ High Precision Results
-              </p>
-              <p className="text-sm text-gray-700">
-                Our calculator provides <strong>9 decimal places precision</strong>, ensuring accuracy for even the most demanding statistical analyses. Perfect for research, academic work, and professional applications.
-              </p>
-            </div>            <div className="mt-6 p-4 bg-pink-50 border-l-4 border-pink-400 rounded">
-              <p className="text-sm text-gray-700">
-                <strong>📝 Tip:</strong> Select your test type and enter the test statistic along with degrees of freedom to get your p-value instantly.
-              </p>
-            </div>
+            </section>
           </div>
         </div>
 
         {/* FAQ Section */}
         <div className="bg-white rounded-2xl shadow-lg p-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">
-            ❓ Frequently Asked Questions
+          <h2 className="text-3xl font-bold text-gray-800 mb-6">
+            ❓ Frequently Asked Questions About P-Values
           </h2>
           
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-bold text-gray-800 mb-2">
-                What does a p-value of 0.05 mean?
+              <h3 className="text-lg font-bold text-purple-700 mb-2">
+                Can a p-value tell me if my results are important?
               </h3>
               <p className="text-gray-700">
-                A p-value of 0.05 means there is a 5% probability of observing your data (or more extreme) if the null hypothesis were true. It's a commonly used threshold for statistical significance, but it's arbitrary and context-dependent.
+                No. Statistical significance (low p-value) and practical significance are different concepts. A study with thousands of participants might show a statistically significant but tiny effect that lacks real-world importance. Always examine effect sizes and confidence intervals alongside p-values to assess practical relevance.
               </p>
             </div>
 
             <div>
-              <h3 className="text-lg font-bold text-gray-800 mb-2">
-                Should I always use 0.05 as my significance level?
+              <h3 className="text-lg font-bold text-purple-700 mb-2">
+                Why shouldn't I just use p &lt; 0.05 for everything?
               </h3>
               <p className="text-gray-700">
-                No. The choice of significance level (alpha) depends on your field, the cost of errors, and the research context. Some fields use 0.01 or 0.10. Always decide on alpha before conducting your test.
+                The 0.05 threshold is conventional, not universal. Fields like particle physics use much stricter thresholds (p &lt; 0.0000003), while exploratory social science might accept p &lt; 0.10. Your significance level should reflect the consequences of false positives versus false negatives in your specific context. Set α before collecting data, not after seeing results.
               </p>
             </div>
 
             <div>
-              <h3 className="text-lg font-bold text-gray-800 mb-2">
-                What's the difference between one-tailed and two-tailed tests?
+              <h3 className="text-lg font-bold text-purple-700 mb-2">
+                What's wrong with interpreting p = 0.03 as "3% chance the null hypothesis is true"?
               </h3>
               <p className="text-gray-700">
-                A one-tailed test checks for an effect in a specific direction. A two-tailed test checks for effects in both directions. Two-tailed tests are more conservative (higher p-values) and are preferred unless you have a strong directional hypothesis.
+                This is a common misinterpretation. The p-value is P(data | H₀), not P(H₀ | data). It tells you how likely your data would be if H₀ were true, not how likely H₀ is given your data. The probability that H₀ is true cannot be determined from p-values alone—that requires Bayesian analysis with prior probabilities.
               </p>
             </div>
 
             <div>
-              <h3 className="text-lg font-bold text-gray-800 mb-2">
-                Can a small p-value prove my hypothesis is correct?
+              <h3 className="text-lg font-bold text-purple-700 mb-2">
+                When should I use a one-tailed test instead of a two-tailed test?
               </h3>
               <p className="text-gray-700">
-                No. A small p-value only provides evidence against the null hypothesis. It doesn't prove your alternative hypothesis or establish causation. Always consider effect size, confidence intervals, and the broader research context.
+                Use one-tailed tests only when you have strong theoretical or practical reasons to test for effects in one direction only, and when effects in the opposite direction would be treated identically to no effect. Since one-tailed tests have more statistical power but risk missing important opposite-direction effects, two-tailed tests are the safer default choice for most research.
               </p>
             </div>
 
             <div>
-              <h3 className="text-lg font-bold text-gray-800 mb-2">
-                How accurate is this calculator?
+              <h3 className="text-lg font-bold text-purple-700 mb-2">
+                How does sample size affect my p-value?
               </h3>
               <p className="text-gray-700">
-                This calculator uses well-established numerical approximations for statistical distributions. Results are accurate to 6 decimal places. For critical research decisions, consider using professional statistical software like R, Python (scipy), or SPSS.
+                Larger samples produce smaller p-values for the same effect size. This means with huge datasets, you might find statistically significant results (small p-values) for trivially small effects. Conversely, small samples might fail to detect important effects (large p-values) due to insufficient statistical power. This is why reporting effect sizes and confidence intervals is crucial alongside p-values.
               </p>
             </div>
 
             <div>
-              <h3 className="text-lg font-bold text-gray-800 mb-2">
-                What if I don't have a test statistic yet?
+              <h3 className="text-lg font-bold text-purple-700 mb-2">
+                What if my p-value is exactly 0.05000?
               </h3>
               <p className="text-gray-700">
-                You can calculate test statistics from raw data using dedicated statistical software. This calculator helps you get the p-value once you have the test statistic and degrees of freedom. Always report both the test statistic and p-value in your results.
+                When p-value equals your α threshold exactly, convention typically treats this as marginally significant (reject H₀). However, this highlights the arbitrary nature of threshold-based decisions. Results at the boundary deserve cautious interpretation, additional replication, and careful consideration of the broader evidence rather than mechanical application of decision rules.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-bold text-purple-700 mb-2">
+                Do I need different degrees of freedom for different tests?
+              </h3>
+              <p className="text-gray-700">
+                Yes. T-tests use df = n - 1 for one-sample tests or df = n₁ + n₂ - 2 for two-sample tests. Chi-square tests use df = (rows - 1) × (columns - 1) for independence tests or df = categories - 1 for goodness-of-fit. F-tests require two df values: df1 (numerator) and df2 (denominator). Each test type has specific formulas for calculating degrees of freedom.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-bold text-purple-700 mb-2">
+                Can I calculate a p-value without knowing the test statistic?
+              </h3>
+              <p className="text-gray-700">
+                No. This calculator requires the test statistic (z, t, χ², or F) as input. If you have raw data, you'll first need to calculate the test statistic using appropriate formulas or statistical software. The test statistic summarizes the relationship between your sample data and the null hypothesis, serving as the necessary input for p-value calculation.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-bold text-purple-700 mb-2">
+                How precise should I report my p-value?
+              </h3>
+              <p className="text-gray-700">
+                For most scientific publications, reporting p-values to 3-4 decimal places is sufficient (e.g., p = 0.0234). For very small p-values, you can report them as p &lt; 0.001 or p &lt; 0.0001. Our calculator provides 9-decimal precision for accuracy, but excessive precision in reporting can create a false sense of exactness. Round sensibly based on your field's conventions.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-bold text-purple-700 mb-2">
+                What's the difference between chi-square test directions?
+              </h3>
+              <p className="text-gray-700">
+                Unlike t-tests and z-tests, chi-square tests are most commonly right-tailed (testing for goodness-of-fit or independence). However, when testing variance of a normal distribution, you might use two-tailed or left-tailed tests. Right-tailed tests check if observed frequencies deviate more than expected, while left-tailed tests (rare) check if variance is smaller than expected. Choose based on your specific hypothesis.
               </p>
             </div>
           </div>

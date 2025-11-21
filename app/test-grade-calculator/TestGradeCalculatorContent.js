@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import FeedbackButton from '../components/FeedbackButton';
 
 export default function TestGradeCalculatorContent() {
   const [totalQuestions, setTotalQuestions] = useState('');
@@ -665,11 +664,6 @@ export default function TestGradeCalculatorContent() {
           >
             Reset
           </button>
-        </div>
-
-        {/* Feedback Button - Centered */}
-        <div className="flex justify-center mt-6">
-          <FeedbackButton calculatorName="Test Grade Calculator" />
         </div>
 
         {result && (
