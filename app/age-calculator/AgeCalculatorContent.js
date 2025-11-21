@@ -582,8 +582,9 @@ export default function AgeCalculatorContent() {
     const handleGroupClick = (group) => {
       setSelection({ group, cursorPos: 0 });
       // 在移动设备上触发隐藏的原生输入框来唤醒键盘
-      if (nativeInputRef.current && /iPhone|iPad|Android/i.test(navigator.userAgent)) {
-        setTimeout(() => nativeInputRef.current?.click(), 50);
+      if (nativeInputRef.current && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        nativeInputRef.current.focus();
+        setTimeout(() => nativeInputRef.current?.click(), 100);
       }
     };
 
@@ -675,8 +676,16 @@ export default function AgeCalculatorContent() {
           type="date"
           value={getNativeDateValue()}
           onChange={handleNativeDateChange}
-          style={{ display: 'none' }}
+          style={{
+            position: 'absolute',
+            opacity: 0,
+            width: '1px',
+            height: '1px',
+            pointerEvents: 'none',
+            zIndex: -1
+          }}
           aria-hidden="true"
+          tabIndex={-1}
         />
         
         <div>
@@ -785,8 +794,9 @@ export default function AgeCalculatorContent() {
       if (disabled) return;
       setSelection({ group, cursorPos: 0 });
       // 在移动设备上触发隐藏的原生输入框来唤醒键盘
-      if (nativeInputRef.current && /iPhone|iPad|Android/i.test(navigator.userAgent)) {
-        setTimeout(() => nativeInputRef.current?.click(), 50);
+      if (nativeInputRef.current && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        nativeInputRef.current.focus();
+        setTimeout(() => nativeInputRef.current?.click(), 100);
       }
     };
 
@@ -882,9 +892,17 @@ export default function AgeCalculatorContent() {
           type="time"
           value={getNativeTimeValue()}
           onChange={handleNativeTimeChange}
-          style={{ display: 'none' }}
+          style={{
+            position: 'absolute',
+            opacity: 0,
+            width: '1px',
+            height: '1px',
+            pointerEvents: 'none',
+            zIndex: -1
+          }}
           aria-hidden="true"
           disabled={disabled}
+          tabIndex={-1}
         />
 
         <div className={`flex items-center gap-1.5 p-2.5 border-2 rounded-lg min-w-[200px] transition-colors ${
