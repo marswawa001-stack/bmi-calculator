@@ -25,6 +25,7 @@ export default function AgeCalculatorContent() {
   
   const [result, setResult] = useState(null);
   const [toast, setToast] = useState({ show: false, message: '', type: 'error' });
+  const [dateError, setDateError] = useState(''); // 内联错误提示
   const [showStartCalendarPicker, setShowStartCalendarPicker] = useState(false);
   const [showEndCalendarPicker, setShowEndCalendarPicker] = useState(false);
   const [calendarPosition, setCalendarPosition] = useState({ top: 0, left: 0 });
@@ -232,10 +233,40 @@ export default function AgeCalculatorContent() {
     });
   };
 
-  // Auto-calculate when all fields are complete
+  // 实时验证单个日期输入
   useEffect(() => {
-    // Check if dates are complete (either from masked inputs or separate fields)
-    const datesFromMaskedInput = validateDate(startDateInput) && validateDate(endDateInput);
+    // 检查开始日期是否完整
+    const startDateComplete = startDateInput !== 'mm/dd/yyyy' && !startDateInput.includes('m') && !startDateInput.includes('d') && !startDateInput.includes('y');
+    
+    if (startDateComplete) {
+      // 如果开始日期完整，验证是否有效
+      if (!validateDate(startDateInput)) {
+        setDateError('Invalid start date! This date does not exist.');
+        setResult(null);
+        return;
+      }
+    } else if (startDateInput !== 'mm/dd/yyyy') {
+      // 开始日期不完整但已开始输入，清除错误
+      setDateError('');
+    }
+    
+    // 检查结束日期是否完整
+    const endDateComplete = endDateInput !== 'mm/dd/yyyy' && !endDateInput.includes('m') && !endDateInput.includes('d') && !endDateInput.includes('y');
+    
+    if (endDateComplete) {
+      // 如果结束日期完整，验证是否有效
+      if (!validateDate(endDateInput)) {
+        setDateError('Invalid end date! This date does not exist.');
+        setResult(null);
+        return;
+      }
+    } else if (endDateInput !== 'mm/dd/yyyy') {
+      // 结束日期不完整但已开始输入，清除错误
+      setDateError('');
+    }
+    
+    // 如果两个日期都完整且都有效，清除错误并计算
+    const datesFromMaskedInput = startDateComplete && endDateComplete;
     const datesFromSeparateFields = startDay && startMonth && startYear && endDay && endMonth && endYear;
     
     // Check if times are valid if included
@@ -244,7 +275,11 @@ export default function AgeCalculatorContent() {
       (!includeEndTime || (includeEndTime && validateTime(endTime)));
     
     if ((datesFromMaskedInput || datesFromSeparateFields) && timesValid) {
+      setDateError(''); // 清除错误
       calculateAge();
+    } else {
+      // 只清除结果，不清除错误（错误应该保留以提示用户）
+      setResult(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startDay, startMonth, startYear, startTime, includeStartTime, endDay, endMonth, endYear, endTime, includeEndTime, startDateInput, endDateInput]);
@@ -533,19 +568,24 @@ export default function AgeCalculatorContent() {
           if (digit === 0 || digit === 1 || digit === 2 || digit === 3) {
             currentDate[3] = String(digit);
             currentDate[4] = 'd';
-          } else {
+          } else if (digit >= 4 && digit <= 9) {
             currentDate[3] = '0';
             currentDate[4] = String(digit);
           }
         } else if (currentDate[4] === 'd') {
-          if (digit <= 9) {
+          const firstDigit = parseInt(currentDate[3]);
+          // 限制：0x可以是01-09，1x可以是10-19，2x可以是20-29，3x只能是30-31
+          if ((firstDigit === 0 && digit >= 1 && digit <= 9) ||
+              (firstDigit === 1 && digit >= 0 && digit <= 9) ||
+              (firstDigit === 2 && digit >= 0 && digit <= 9) ||
+              (firstDigit === 3 && digit >= 0 && digit <= 1)) {
             currentDate[4] = String(digit);
           }
         } else {
           if (digit === 0 || digit === 1 || digit === 2 || digit === 3) {
             currentDate[3] = String(digit);
             currentDate[4] = 'd';
-          } else {
+          } else if (digit >= 4 && digit <= 9) {
             currentDate[3] = '0';
             currentDate[4] = String(digit);
           }
@@ -561,13 +601,16 @@ export default function AgeCalculatorContent() {
           currentDate[8] = 'y';
           currentDate[9] = 'y';
         } else {
-          // Shift left and add new digit
-          const yearArray = currentYYYY.split('');
-          yearArray.shift();
-          yearArray.push(char);
-          const yearStr = yearArray.join('');
+          // 移除所有 'y' 占位符，只保留数字，然后移位
+          const digits = currentYYYY.split('').filter(c => c !== 'y');
+          digits.push(char);
+          // 如果超过4位，移除最左边的数字
+          if (digits.length > 4) {
+            digits.shift();
+          }
+          // 填充到currentDate
           for (let i = 0; i < 4; i++) {
-            currentDate[6 + i] = yearStr[i];
+            currentDate[6 + i] = digits[i] || 'y';
           }
         }
       }
@@ -577,22 +620,35 @@ export default function AgeCalculatorContent() {
   };
 
   const renderDateInput = (dateStr, setDate, selection, setSelection, dateType = 'start') => {
-    const nativeInputRef = useRef(null);
+    const monthInputRef = useRef(null);
+    const dayInputRef = useRef(null);
+    const yearInputRef = useRef(null);
 
     const handleGroupClick = (group) => {
       setSelection({ group, cursorPos: 0 });
-      // 在移动设备上触发隐藏的原生输入框来唤醒键盘
-      if (nativeInputRef.current && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        nativeInputRef.current.focus();
-        setTimeout(() => nativeInputRef.current?.click(), 100);
+      // 聚焦对应的输入框
+      if (group === 'mm' && monthInputRef.current) {
+        monthInputRef.current.focus();
+        monthInputRef.current.select();
+      } else if (group === 'dd' && dayInputRef.current) {
+        dayInputRef.current.focus();
+        dayInputRef.current.select();
+      } else if (group === 'yyyy' && yearInputRef.current) {
+        yearInputRef.current.focus();
+        yearInputRef.current.select();
       }
     };
 
-    const handleNativeDateChange = (e) => {
-      const value = e.target.value; // yyyy-mm-dd
-      if (value) {
-        const [year, month, day] = value.split('-');
-        setDate(`${month}/${day}/${year}`);
+    const handleInputChange = (e, group) => {
+      const value = e.target.value;
+      // 只允许数字
+      const numericValue = value.replace(/[^0-9]/g, '');
+      
+      if (numericValue) {
+        // 模拟键盘输入
+        for (let i = 0; i < numericValue.length; i++) {
+          handleGroupDateInput(numericValue[i], dateStr, setDate, setSelection, { group });
+        }
       }
     };
 
@@ -658,36 +714,8 @@ export default function AgeCalculatorContent() {
     const isValid = dateStr !== 'mm/dd/yyyy' && validateDate(dateStr);
     const isInvalid = dateStr !== 'mm/dd/yyyy' && !validateDate(dateStr);
 
-    // 为了兼容 HTML date input 的 YYYY-MM-DD 格式
-    const getNativeDateValue = () => {
-      if (dateStr === 'mm/dd/yyyy') return '';
-      const parts = dateStr.split('/');
-      if (parts.length === 3 && parts[0] !== 'm' && parts[1] !== 'd' && parts[2] !== 'y') {
-        return `${parts[2]}-${parts[0]}-${parts[1]}`;
-      }
-      return '';
-    };
-
     return (
       <>
-        {/* 隐藏的原生日期输入框，用于在移动设备上唤醒键盘 */}
-        <input
-          ref={nativeInputRef}
-          type="date"
-          value={getNativeDateValue()}
-          onChange={handleNativeDateChange}
-          style={{
-            position: 'absolute',
-            opacity: 0,
-            width: '1px',
-            height: '1px',
-            pointerEvents: 'none',
-            zIndex: -1
-          }}
-          aria-hidden="true"
-          tabIndex={-1}
-        />
-        
         <div>
           <div className={`flex items-center gap-1.5 p-2.5 border-2 rounded-lg transition-all min-w-[240px] ${
             isValid 
@@ -697,59 +725,74 @@ export default function AgeCalculatorContent() {
               : 'border-green-300 bg-green-50 focus-within:border-green-600'
           }`}>
           {/* Month Group */}
-          <button
+          <input
+            ref={monthInputRef}
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            value={month}
+            onChange={(e) => handleInputChange(e, 'mm')}
             onClick={() => handleGroupClick('mm')}
             onKeyDown={handleKeyDown}
             onBlur={handleBlur}
-            className={`px-2.5 py-1 rounded font-mono font-bold text-base tracking-wider transition-colors w-12 ${
+            className={`px-2 py-1 rounded font-mono font-bold text-base tracking-wide transition-colors w-14 text-center cursor-pointer ${
               selection.group === 'mm'
-                ? 'bg-green-600 text-white'
+                ? 'bg-green-600 text-white ring-2 ring-green-400'
                 : 'bg-white text-gray-700 border border-green-200 hover:bg-green-100'
             }`}
             tabIndex={selection.group === 'mm' ? 0 : -1}
-          >
-            {month}
-          </button>
+          />
 
           {/* Slash */}
           <span className="text-green-400 font-bold">/</span>
 
           {/* Day Group */}
-          <button
+          <input
+            ref={dayInputRef}
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            value={day}
+            onChange={(e) => handleInputChange(e, 'dd')}
             onClick={() => handleGroupClick('dd')}
             onKeyDown={handleKeyDown}
             onBlur={handleBlur}
-            className={`px-2.5 py-1 rounded font-mono font-bold text-base tracking-wider transition-colors w-12 ${
+            className={`px-2 py-1 rounded font-mono font-bold text-base tracking-wide transition-colors w-14 text-center cursor-pointer ${
               selection.group === 'dd'
-                ? 'bg-green-600 text-white'
+                ? 'bg-green-600 text-white ring-2 ring-green-400'
                 : 'bg-white text-gray-700 border border-green-200 hover:bg-green-100'
             }`}
             tabIndex={selection.group === 'dd' ? 0 : -1}
-          >
-            {day}
-          </button>
+          />
 
           {/* Slash */}
           <span className="text-green-400 font-bold">/</span>
 
           {/* Year Group */}
-          <button
+          <input
+            ref={yearInputRef}
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            value={year}
+            onChange={(e) => handleInputChange(e, 'yyyy')}
             onClick={() => handleGroupClick('yyyy')}
             onKeyDown={handleKeyDown}
             onBlur={handleBlur}
-            className={`px-2.5 py-1 rounded font-mono font-bold text-base tracking-wider transition-colors w-16 ${
+            className={`px-2 py-1 rounded font-mono font-bold text-base tracking-wide transition-colors w-20 text-center cursor-pointer ${
               selection.group === 'yyyy'
-                ? 'bg-green-600 text-white'
+                ? 'bg-green-600 text-white ring-2 ring-green-400'
                 : 'bg-white text-gray-700 border border-green-200 hover:bg-green-100'
             }`}
             tabIndex={selection.group === 'yyyy' ? 0 : -1}
-          >
-            {year}
-          </button>
+          />
 
           {/* Clear Button - disabled when date is empty */}
           <button
-            onClick={() => setDate('mm/dd/yyyy')}
+            onClick={() => {
+              setDate('mm/dd/yyyy');
+              setDateError(''); // 清除错误信息
+            }}
             disabled={dateStr === 'mm/dd/yyyy'}
             className={`ml-1 px-1.5 py-1 rounded transition-colors flex-shrink-0 ${
               dateStr === 'mm/dd/yyyy'
@@ -788,31 +831,62 @@ export default function AgeCalculatorContent() {
   };
 
   const renderTimeInput = (time, setTime, selection, setSelection, disabled = false) => {
-    const nativeInputRef = useRef(null);
+    const hourInputRef = useRef(null);
+    const minuteInputRef = useRef(null);
+    const ampmInputRef = useRef(null);
+    const [showAmPmDropdown, setShowAmPmDropdown] = useState(false);
 
     const handleGroupClick = (group) => {
       if (disabled) return;
       setSelection({ group, cursorPos: 0 });
-      // 在移动设备上触发隐藏的原生输入框来唤醒键盘
-      if (nativeInputRef.current && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        nativeInputRef.current.focus();
-        setTimeout(() => nativeInputRef.current?.click(), 100);
+      // 聚焦对应的输入框
+      if (group === 'hh' && hourInputRef.current) {
+        hourInputRef.current.focus();
+        hourInputRef.current.select();
+        setShowAmPmDropdown(false);
+      } else if (group === 'mm' && minuteInputRef.current) {
+        minuteInputRef.current.focus();
+        minuteInputRef.current.select();
+        setShowAmPmDropdown(false);
+      } else if (group === 'aa') {
+        // 切换 AM/PM 下拉菜单
+        setShowAmPmDropdown(!showAmPmDropdown);
       }
     };
 
-    const handleNativeTimeChange = (e) => {
-      const value = e.target.value; // HH:mm (24小时制)
-      if (value) {
-        const [hours24, minutes] = value.split(':').map(Number);
-        // 转换为12小时制
-        const period = hours24 >= 12 ? 'PM' : 'AM';
-        const hours12 = hours24 % 12 || 12;
-        setTime(`${String(hours12).padStart(2, '0')}:${String(minutes).padStart(2, '0')} ${period}`);
+    const handleAmPmSelect = (value) => {
+      const timeArray = time.split('');
+      timeArray[6] = value[0];
+      timeArray[7] = value[1];
+      setTime(timeArray.join(''));
+      setShowAmPmDropdown(false);
+      setSelection({ group: null, cursorPos: 0 });
+    };
+
+    const handleInputChange = (e, group) => {
+      const value = e.target.value;
+      
+      if (group === 'hh' || group === 'mm') {
+        // 只允许数字
+        const numericValue = value.replace(/[^0-9]/g, '');
+        if (numericValue) {
+          for (let i = 0; i < numericValue.length; i++) {
+            handleGroupTimeInput(numericValue[i], time, setTime, setSelection, { group });
+          }
+        }
+      } else if (group === 'aa') {
+        // AM/PM
+        const upperValue = value.toUpperCase();
+        if (upperValue.includes('A') || upperValue.includes('P')) {
+          handleGroupTimeInput(upperValue[0], time, setTime, setSelection, { group });
+        }
       }
     };
 
     const handleBlur = () => {
       setSelection({ group: null, cursorPos: 0 });
+      // 延迟关闭下拉菜单，以便点击选项能够生效
+      setTimeout(() => setShowAmPmDropdown(false), 200);
     };
 
     const handleKeyDown = (e) => {
@@ -866,109 +940,101 @@ export default function AgeCalculatorContent() {
     const minutes = time.substring(3, 5);
     const ampm = time.substring(6, 8);
 
-    // 为了兼容 HTML time input 的 HH:mm 格式（24小时制）
-    const getNativeTimeValue = () => {
-      if (time === 'hh:mm aa') return '';
-      const match = time.match(/(\d{1,2}):(\d{2})\s*(AM|PM|am|pm)/);
-      if (match) {
-        let hours24 = parseInt(match[1]);
-        const min = match[2];
-        const period = match[3].toUpperCase();
-        if (period === 'PM' && hours24 !== 12) {
-          hours24 += 12;
-        } else if (period === 'AM' && hours24 === 12) {
-          hours24 = 0;
-        }
-        return `${String(hours24).padStart(2, '0')}:${min}`;
-      }
-      return '';
-    };
-
     return (
       <>
-        {/* 隐藏的原生时间输入框，用于在移动设备上唤醒键盘 */}
-        <input
-          ref={nativeInputRef}
-          type="time"
-          value={getNativeTimeValue()}
-          onChange={handleNativeTimeChange}
-          style={{
-            position: 'absolute',
-            opacity: 0,
-            width: '1px',
-            height: '1px',
-            pointerEvents: 'none',
-            zIndex: -1
-          }}
-          aria-hidden="true"
-          disabled={disabled}
-          tabIndex={-1}
-        />
-
         <div className={`flex items-center gap-1.5 p-2.5 border-2 rounded-lg min-w-[200px] transition-colors ${
           disabled 
             ? 'border-gray-300 bg-gray-50' 
             : 'border-blue-300 bg-blue-50'
         }`}>
             {/* Hour Group */}
-            <button
+            <input
+              ref={hourInputRef}
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              value={hours}
+              onChange={(e) => handleInputChange(e, 'hh')}
               onClick={() => handleGroupClick('hh')}
               onKeyDown={handleKeyDown}
               onBlur={handleBlur}
               disabled={disabled}
-              className={`px-2.5 py-1 rounded font-mono font-bold text-base tracking-wider transition-colors border w-12 ${
+              className={`px-2 py-1 rounded font-mono font-bold text-base tracking-wide transition-colors border w-14 text-center cursor-pointer ${
                 disabled
                   ? 'bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed'
                   : selection.group === 'hh'
-                  ? 'bg-blue-600 text-white border-blue-600'
+                  ? 'bg-blue-600 text-white border-blue-600 ring-2 ring-blue-400'
                   : 'bg-white text-gray-700 border-blue-200 hover:bg-blue-100'
               }`}
               tabIndex={disabled || selection.group !== 'hh' ? -1 : 0}
-            >
-              {hours}
-            </button>
+            />
 
             {/* Colon */}
             <span className={`font-bold ${disabled ? 'text-gray-400' : 'text-blue-400'}`}>:</span>
 
             {/* Minute Group */}
-            <button
+            <input
+              ref={minuteInputRef}
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              value={minutes}
+              onChange={(e) => handleInputChange(e, 'mm')}
               onClick={() => handleGroupClick('mm')}
               onKeyDown={handleKeyDown}
               onBlur={handleBlur}
               disabled={disabled}
-              className={`px-2.5 py-1 rounded font-mono font-bold text-base tracking-wider transition-colors border w-12 ${
+              className={`px-2 py-1 rounded font-mono font-bold text-base tracking-wide transition-colors border w-14 text-center cursor-pointer ${
                 disabled
                   ? 'bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed'
                   : selection.group === 'mm'
-                  ? 'bg-blue-600 text-white border-blue-600'
+                  ? 'bg-blue-600 text-white border-blue-600 ring-2 ring-blue-400'
                   : 'bg-white text-gray-700 border-blue-200 hover:bg-blue-100'
               }`}
               tabIndex={disabled || selection.group !== 'mm' ? -1 : 0}
-            >
-              {minutes}
-            </button>
+            />
 
             {/* Divider */}
             <span className={disabled ? 'text-gray-400' : 'text-blue-400'}>|</span>
 
-            {/* AM/PM Group */}
-            <button
-              onClick={() => handleGroupClick('aa')}
-              onKeyDown={handleKeyDown}
-              onBlur={handleBlur}
-              disabled={disabled}
-              className={`px-2.5 py-1 rounded font-mono font-bold text-base tracking-wider transition-colors border w-12 ${
-                disabled
-                  ? 'bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed'
-                  : selection.group === 'aa'
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'bg-white text-gray-700 border-blue-200 hover:bg-blue-100'
-              }`}
-              tabIndex={disabled || selection.group !== 'aa' ? -1 : 0}
-            >
-              {ampm}
-            </button>
+            {/* AM/PM Group - 自定义下拉选择 */}
+            <div className="relative">
+              <button
+                ref={ampmInputRef}
+                type="button"
+                onClick={() => handleGroupClick('aa')}
+                disabled={disabled}
+                className={`px-2 py-1 rounded font-mono font-bold text-base tracking-wide transition-colors border w-16 text-center cursor-pointer ${
+                  disabled
+                    ? 'bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed'
+                    : showAmPmDropdown || selection.group === 'aa'
+                    ? 'bg-blue-600 text-white border-blue-600 ring-2 ring-blue-400'
+                    : 'bg-white text-gray-700 border-blue-200 hover:bg-blue-100'
+                }`}
+              >
+                {ampm}
+              </button>
+              
+              {/* 自定义下拉菜单 */}
+              {showAmPmDropdown && !disabled && (
+                <div className="absolute top-full left-0 mt-1 bg-white border-2 border-blue-400 rounded-lg shadow-lg z-50 overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => handleAmPmSelect('AM')}
+                    className="w-16 px-2 py-1.5 text-center font-mono font-bold text-sm text-gray-700 hover:bg-blue-100 hover:text-blue-600 transition-colors border-b border-gray-200"
+                  >
+                    AM
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleAmPmSelect('PM')}
+                    className="w-16 px-2 py-1.5 text-center font-mono font-bold text-sm text-gray-700 hover:bg-blue-100 hover:text-blue-600 transition-colors"
+                  >
+                    PM
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
       </>
     );
@@ -1018,6 +1084,7 @@ export default function AgeCalculatorContent() {
     setShowStartCalendar(false);
     setShowEndCalendar(false);
     setResult(null);
+    setDateError(''); // 清除错误信息
   };
 
   const currentYear = new Date().getFullYear();
@@ -1103,6 +1170,15 @@ export default function AgeCalculatorContent() {
               </div>
             </div>
           </div>
+
+          {/* 内联错误提示 */}
+          {dateError && (
+            <div className="text-center">
+              <div className="inline-block bg-red-100 border-2 border-red-400 text-red-700 px-4 py-2 rounded-lg text-sm font-medium">
+                ⚠️ {dateError}
+              </div>
+            </div>
+          )}
 
           {/* Result Display */}
           {result && (
