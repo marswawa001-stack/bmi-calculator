@@ -36,6 +36,29 @@ export default function AnnealingCalculatorContent() {
     return valueC;
   };
 
+  const formatTemp = (valueC, unit, decimals = 1) => {
+    const v = convertFromC(valueC, unit);
+    const fixed = unit === 'K' ? v.toFixed(2) : v.toFixed(decimals);
+    return `${fixed}${getUnitSymbol(unit)}`;
+  };
+
+  // Format a temperature difference (delta). Delta conversion should NOT apply
+  // absolute offsets (no +273.15 for K, no +32 for F). Only scale where appropriate.
+  const formatDelta = (deltaC, unit, decimals = 1) => {
+    if (unit === 'C') {
+      return `${deltaC.toFixed(decimals)}${getUnitSymbol('C')}`;
+    }
+    if (unit === 'K') {
+      // Celsius degree and Kelvin degree are same magnitude for differences
+      return `${deltaC.toFixed(decimals)}K`;
+    }
+    if (unit === 'F') {
+      const v = (deltaC * 9) / 5;
+      return `${v.toFixed(decimals)}${getUnitSymbol('F')}`;
+    }
+    return `${deltaC.toFixed(decimals)}${getUnitSymbol('C')}`;
+  };
+
   const cToF = (c) => (c * 9) / 5 + 32;
   const cToK = (c) => c + 273.15;
 
@@ -85,24 +108,24 @@ export default function AnnealingCalculatorContent() {
 
     // Hard limits: 50-68°C
     if (numValC < 50) {
-      return { type: 'error', message: `Primer Tm is too low (${numValC.toFixed(1)}°C). Acceptable range is 50-68°C, ideal range is 52-58°C. Please redesign primers or check input.`, showResult: false };
+      return { type: 'error', message: `Primer Tm is too low (${formatTemp(numValC, unit)}). Acceptable range is ${formatTemp(50, unit)} - ${formatTemp(68, unit)}, ideal range is ${formatTemp(52, unit)} - ${formatTemp(58, unit)}. Please redesign primers or check input.`, showResult: false };
     }
     if (numValC > 68) {
-      return { type: 'error', message: `Primer Tm is too high (${numValC.toFixed(1)}°C). Exceeds acceptable range (50-68°C), prone to secondary annealing. Please redesign primers.`, showResult: false };
+      return { type: 'error', message: `Primer Tm is too high (${formatTemp(numValC, unit)}). Exceeds acceptable range (${formatTemp(50, unit)} - ${formatTemp(68, unit)}), prone to secondary annealing. Please redesign primers.`, showResult: false };
     }
 
     // Detailed range evaluation
     if (numValC < 52) {
-      return { type: 'warning', message: `Primer Tm is low (${numValC.toFixed(1)}°C). At lower limit of acceptable range. Ideal range is 52-58°C. Recommend optimizing primer design for best results.`, showResult: true };
+      return { type: 'warning', message: `Primer Tm is low (${formatTemp(numValC, unit)}). At lower limit of acceptable range (${formatTemp(50, unit)} - ${formatTemp(68, unit)}). Ideal range is ${formatTemp(52, unit)} - ${formatTemp(58, unit)}. Recommend optimizing primer design for best results.`, showResult: true };
     }
     if (numValC <= 58) {
-      return { type: 'ideal', message: `Primer Tm is in ideal range (${numValC.toFixed(1)}°C)`, showResult: true };
+      return { type: 'ideal', message: `Primer Tm is in ideal range (${formatTemp(numValC, unit)})`, showResult: true };
     }
     if (numValC <= 64) {
-      return { type: 'good', message: `Primer Tm is in recommended range (${numValC.toFixed(1)}°C)`, showResult: true };
+      return { type: 'good', message: `Primer Tm is in recommended range (${formatTemp(numValC, unit)})`, showResult: true };
     }
     
-    return { type: 'notice', message: `Primer Tm is slightly high (${numValC.toFixed(1)}°C). Usable but note risk of secondary annealing. Ideal range is 52-58°C.`, showResult: true };
+    return { type: 'notice', message: `Primer Tm is slightly high (${formatTemp(numValC, unit)}). Usable but note risk of secondary annealing. Ideal range is ${formatTemp(52, unit)} - ${formatTemp(58, unit)}.`, showResult: true };
   };
 
   // Validate Product Tm: 55-100°C (hard limits)
@@ -121,76 +144,90 @@ export default function AnnealingCalculatorContent() {
 
     // Hard limits: 55-100°C
     if (numValC < 55) {
-      return { type: 'error', message: `Product Tm is too low (<55°C). Out of PCR operation range. Please check input. (Current: ${numValC.toFixed(1)}°C)`, showResult: false };
+      return { type: 'error', message: `Product Tm is too low (${formatTemp(numValC, unit)}). Out of PCR operation range (${formatTemp(55, unit)} - ${formatTemp(100, unit)}). Please check input.`, showResult: false };
     }
     if (numValC > 100) {
-      return { type: 'error', message: `Product Tm exceeds PCR operation range (>100°C). Please check input or redesign. (Current: ${numValC.toFixed(1)}°C)`, showResult: false };
+      return { type: 'error', message: `Product Tm exceeds PCR operation range (${formatTemp(55, unit)} - ${formatTemp(100, unit)}). Please check input or redesign. (Current: ${formatTemp(numValC, unit)})`, showResult: false };
     }
 
     // Detailed range evaluation
     if (numValC < 60) {
-      return { type: 'warning', message: `Product Tm is low (<60°C). May be very short fragment (<100bp). Please confirm design.`, showResult: true };
+      return { type: 'warning', message: `Product Tm is low (${formatTemp(numValC, unit)}). May be very short fragment (<100bp). Please confirm design.`, showResult: true };
     }
     if (numValC < 70) {
-      return { type: 'notice', message: `Product Tm is low (60-70°C). Suitable for short fragments (100-300bp).`, showResult: true };
+      return { type: 'notice', message: `Product Tm is low (${formatTemp(numValC, unit)}). Suitable for short fragments (${formatTemp(60, unit)} - ${formatTemp(70, unit)}).`, showResult: true };
     }
     if (numValC > 95) {
-      return { type: 'notice', message: `Product Tm is close to boiling point (95-100°C). Please confirm input. May require special PCR conditions.`, showResult: true };
+      return { type: 'notice', message: `Product Tm is close to boiling point (${formatTemp(95, unit)} - ${formatTemp(100, unit)}). Please confirm input. May require special PCR conditions.`, showResult: true };
     }
     
-    return { type: 'ideal', message: `Product Tm is in standard range (70-90°C)`, showResult: true };
+    return { type: 'ideal', message: `Product Tm is in standard range (${formatTemp(70, unit)} - ${formatTemp(90, unit)})`, showResult: true };
   };
 
   // Validate relationship between Primer and Product Tm
-  const validateRelation = (primerC, productC) => {
+  const validateRelation = (primerC, productC, unitPrimer, unitProduct) => {
     if (primerC === null || productC === null) return null;
 
     const diff = productC - primerC;
 
+    const productDisp = formatTemp(productC, unitProduct);
+    const primerDisp = formatTemp(primerC, unitPrimer);
+    const diffDisp = formatDelta(diff, unitProduct);
+
     if (diff < -15) {
-      return { type: 'severe', message: `SEVERE WARNING: Product Tm (${productC.toFixed(1)}°C) is far below Primer Tm (${primerC.toFixed(1)}°C). Difference: ${diff.toFixed(1)}°C. This is abnormal and may indicate design error.`, showResult: true };
+      return { type: 'severe', message: `SEVERE WARNING: Product Tm (${productDisp}) is far below Primer Tm (${primerDisp}). Difference: ${diffDisp}. This is abnormal and may indicate design error.`, showResult: true };
     }
     if (diff < -10) {
-      return { type: 'warning', message: `WARNING: Product Tm (${productC.toFixed(1)}°C) is significantly below Primer Tm (${primerC.toFixed(1)}°C). Difference: ${diff.toFixed(1)}°C. Please verify design.`, showResult: true };
+      return { type: 'warning', message: `WARNING: Product Tm (${productDisp}) is significantly below Primer Tm (${primerDisp}). Difference: ${diffDisp}. Please verify design.`, showResult: true };
     }
     if (diff < -5) {
-      return { type: 'notice', message: `Product Tm (${productC.toFixed(1)}°C) is below Primer Tm (${primerC.toFixed(1)}°C). Difference: ${diff.toFixed(1)}°C.`, showResult: true };
+      return { type: 'notice', message: `Product Tm (${productDisp}) is below Primer Tm (${primerDisp}). Difference: ${diffDisp}.`, showResult: true };
     }
     if (diff < 5) {
-      return { type: 'notice', message: `Tip: Product Tm (${productC.toFixed(1)}°C) and Primer Tm (${primerC.toFixed(1)}°C) have small difference (${diff.toFixed(1)}°C). Ideal difference should be ≥10°C. Consider optimizing design.`, showResult: true };
+      return { type: 'notice', message: `Tip: Product Tm (${productDisp}) and Primer Tm (${primerDisp}) have small difference (${diffDisp}). Ideal difference should be ≥${formatDelta(10, unitProduct)}. Consider optimizing design.`, showResult: true };
     }
     if (diff < 10) {
-      return { type: 'good', message: `Product Tm is higher than Primer Tm. Difference: ${diff.toFixed(1)}°C is in acceptable range, approaching ideal design.`, showResult: true };
+      return { type: 'good', message: `Product Tm is higher than Primer Tm. Difference: ${diffDisp} is in acceptable range, approaching ideal design.`, showResult: true };
     }
     if (diff <= 30) {
-      return { type: 'ideal', message: `Product-Primer Tm difference is ${diff.toFixed(1)}°C. In ideal range (10-30°C).`, showResult: true };
+      return { type: 'ideal', message: `Product-Primer Tm difference is ${diffDisp}. In ideal range (${formatDelta(10, unitProduct)} - ${formatDelta(30, unitProduct)}).`, showResult: true };
     }
     if (diff <= 40) {
-      return { type: 'good', message: `Product Tm is significantly higher than Primer Tm. Difference: ${diff.toFixed(1)}°C. Suitable for long fragment amplification or high GC sequences.`, showResult: true };
+      return { type: 'good', message: `Product Tm is significantly higher than Primer Tm. Difference: ${diffDisp}. Suitable for long fragment amplification or high GC sequences.`, showResult: true };
     }
     
-    return { type: 'notice', message: `Tip: Product-Primer Tm difference is large (${diff.toFixed(1)}°C). Please confirm input is correct. If correct, may be applicable to special long fragment amplification.`, showResult: true };
+    return { type: 'notice', message: `Tip: Product-Primer Tm difference is large (${diffDisp}). Please confirm input is correct. If correct, may be applicable to special long fragment amplification.`, showResult: true };
   };
 
   // Validate calculated Ta*
   const validateTa = (ta) => {
+    // Return only type here; messages are generated at render time using chosen result unit
     if (ta < 40) {
-      return { type: 'severe', message: `At this temperature: • Non-specific amplification risk is extremely high • Primer dimers are severe • PCR specificity is extremely poor. Recommendation: Redesign primers/product to increase Tm values.`, showResult: true };
+      return { type: 'severe', showResult: true };
     }
     if (ta < 50) {
-      return { type: 'warning', message: `Below recommended range (50-68°C). May cause non-specific amplification. Recommendation: Optimize through gradient PCR or redesign primers.`, showResult: true };
+      return { type: 'warning', showResult: true };
     }
     if (ta <= 68) {
-      return { type: 'ideal', message: `In standard recommended range (50-68°C).`, showResult: true };
+      return { type: 'ideal', showResult: true };
     }
     if (ta <= 72) {
-      return { type: 'good', message: `Moderately high. Suitable for high GC sequences or high-specificity amplification.`, showResult: true };
+      return { type: 'good', showResult: true };
     }
     if (ta <= 75) {
-      return { type: 'notice', message: `High. Primers may be difficult to bind target sequence effectively. Recommendation: Lower primer Tm or increase product Tm.`, showResult: true };
+      return { type: 'notice', showResult: true };
     }
-    
-    return { type: 'severe', message: `Too high. Primers will have difficulty binding target sequence. Recommendation: Redesign primer/product combination.`, showResult: true };
+    return { type: 'severe', showResult: true };
+  };
+
+  const getTaMessage = (type, unit) => {
+    if (!type) return '';
+    if (type === 'severe') return `At this temperature: • Non-specific amplification risk is extremely high • Primer dimers are severe • PCR specificity is extremely poor. Recommendation: Redesign primers/product to increase Tm values.`;
+    if (type === 'warning') return `Below recommended range (${formatTemp(50, unit)} - ${formatTemp(68, unit)}). May cause non-specific amplification. Recommendation: Optimize through gradient PCR or redesign primers.`;
+    if (type === 'ideal') return `In standard recommended range (${formatTemp(50, unit)} - ${formatTemp(68, unit)}).`;
+    if (type === 'good') return `Moderately high. Suitable for high GC sequences or high-specificity amplification.`;
+    if (type === 'notice') return `High. Primers may be difficult to bind target sequence effectively. Recommendation: Lower primer Tm or increase product Tm.`;
+    return `Too high. Primers will have difficulty binding target sequence. Recommendation: Redesign primer/product combination.`;
   };
 
   // Get status icon and color
@@ -220,7 +257,7 @@ export default function AnnealingCalculatorContent() {
     // Relational validation
     let relationalValid = null;
     if (primerC !== null && productC !== null && primerValid?.showResult && productValid?.showResult) {
-      relationalValid = validateRelation(primerC, productC);
+      relationalValid = validateRelation(primerC, productC, unitPrimer, unitProduct);
     }
     setRelationalValidation(relationalValid);
 
@@ -325,9 +362,6 @@ export default function AnnealingCalculatorContent() {
         <div className="space-y-6">
           <div>
             <h2 className="text-2xl font-bold text-gray-800">Annealing Temperature Calculator</h2>
-            <p className="text-sm text-white bg-blue-600 mt-1 px-3 py-1 rounded-lg inline-block">
-              Formula: Ta = 0.3 × Tm(primer) + 0.7 × Tm(product) - 14.9
-            </p>
           </div>
 
           {/* Primer Tm */}
@@ -530,7 +564,7 @@ export default function AnnealingCalculatorContent() {
                 }`}>
                   <p className="text-sm">
                     <span className="mr-2">{getStatusDisplay(result.validation.type).icon}</span>
-                    Annealing temperature ({result.taC}°C): {result.validation.message}
+                    Annealing temperature ({formatTemp(result.taC, resultUnit)}): {result.validation.message ? result.validation.message : getTaMessage(result.validation.type, resultUnit)}
                   </p>
                 </div>
               )}
@@ -547,7 +581,7 @@ export default function AnnealingCalculatorContent() {
                 <p className="text-xs font-semibold text-gray-700 uppercase">Experimental Tips:</p>
                 <ul className="text-sm text-gray-700 space-y-1">
                   <li>• Tm formula: Ta = 0.3 × Tmp + 0.7 × Tmt - 14.9 (Rychlik et al., 1990)</li>
-                  <li>• Recommended annealing range: 50-68°C for optimal PCR specificity</li>
+                  <li>• Recommended annealing range: {formatTemp(50, resultUnit)} - {formatTemp(68, resultUnit)} for optimal PCR specificity</li>
                   <li>• Use gradient PCR to fine-tune temperature around calculated value</li>
                   <li>• If non-specific bands appear, increase temperature or redesign primers</li>
                   <li>• Primer Tm (Tmp) should use the lower Tm value in primer pair</li>
