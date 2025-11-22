@@ -108,17 +108,17 @@ export default function Home() {
         </svg>
       ),
     },
-      {
-        id: 'math',
-        name: 'Math',
-        count: 0,
-        color: 'bg-blue-50 hover:bg-blue-100 border-blue-200',
-        icon: (
-          <svg className="w-12 h-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-          </svg>
-        ),
-      },
+    {
+      id: 'math',
+      name: 'Math',
+      count: 1,
+      color: 'bg-blue-50 hover:bg-blue-100 border-blue-200',
+      icon: (
+        <svg className="w-12 h-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+        </svg>
+      ),
+    },
     {
       id: 'physics',
       name: 'Physics',
@@ -195,6 +195,12 @@ export default function Home() {
       name: 'Annealing Temperature Calculator',
       categoryId: 'biology',
       description: 'Estimate PCR primer annealing temperature (Ta) from primer and target melting temperatures (Tm).'
+    },
+    {
+      id: 'average-percentage-calculator',
+      name: 'Average Percentage Calculator',
+      categoryId: 'math',
+      description: 'Calculate simple or weighted average of percentages with ease. Perfect for academics, business, and research data.'
     },
   ];
 
@@ -468,6 +474,18 @@ export default function Home() {
               </h3>
               <p className="text-gray-600">
                 Estimate PCR primer annealing temperature (Ta) from primer and target melting temperatures (Tm).
+              </p>
+            </a>
+
+            <a
+              href="/average-percentage-calculator"
+              className="group bg-gradient-to-r from-indigo-50 to-blue-50 border-2 border-indigo-200 rounded-xl p-6 hover:shadow-xl transition-all duration-300"
+            >
+              <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-indigo-600">
+                Average Percentage Calculator
+              </h3>
+              <p className="text-gray-600">
+                Calculate simple or weighted average of percentages with ease. Perfect for academics and business analytics.
               </p>
             </a>
           </div>

@@ -51,6 +51,12 @@ export default function Navigation() {
       category: 'Biology',
       path: '/annealing-temperature-calculator'
     },
+    {
+      id: 'average-percentage-calculator',
+      name: 'Average Percentage Calculator',
+      category: 'Math',
+      path: '/average-percentage-calculator'
+    },
   ];
 
   const categories = [
@@ -77,7 +83,7 @@ export default function Navigation() {
         calc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         calc.category.toLowerCase().includes(searchQuery.toLowerCase())
       );
-      setSearchResults(filtered.slice(0, 8)); // 最多显示 8 个结果
+      setSearchResults(filtered.slice(0, 10)); // 最多显示 10 个结果
       setShowDropdown(true);
       setSelectedIndex(-1);
     } else {
@@ -220,7 +226,7 @@ export default function Navigation() {
                   onFocus={() => searchQuery.trim() && setShowDropdown(true)}
                   onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
                   autoFocus={true}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-indigo-500 focus:outline-none focus:placeholder-transparent text-sm placeholder-gray-600"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-indigo-500 focus:outline-none text-sm text-gray-900 placeholder-gray-400"
                 />
                 <button
                   type="submit"
@@ -234,8 +240,8 @@ export default function Navigation() {
 
                 {/* Search Results Dropdown */}
                 {showDropdown && searchResults.length > 0 && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-xl z-50 max-h-64 overflow-y-auto">
-                    {searchResults.slice(0, 5).map((calc, index) => (
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto">
+                    {searchResults.slice(0, 10).map((calc, index) => (
                       <button
                         key={calc.id}
                         type="button"

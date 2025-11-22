@@ -50,7 +50,16 @@ export const categoryData = {
     bgColor: 'bg-blue-50',
     borderColor: 'border-blue-200',
     iconBg: 'bg-blue-100',
-    calculators: []
+    calculators: [
+      {
+        id: 'average-percentage-calculator',
+        name: 'Average Percentage Calculator',
+        description: 'Calculate simple or weighted average of multiple percentages',
+        icon: '📊',
+        path: '/average-percentage-calculator',
+        popular: false
+      }
+    ]
   },
   conversion: {
     name: 'Conversion',

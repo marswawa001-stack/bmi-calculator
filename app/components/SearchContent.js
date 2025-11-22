@@ -40,6 +40,13 @@ const allCalculators = [
     description: 'Estimate PCR primer annealing temperature (Ta) from primer and target melting temperatures (Tm).',
     path: '/annealing-temperature-calculator'
   },
+  {
+    id: 'average-percentage-calculator',
+    name: 'Average Percentage Calculator',
+    category: 'Math',
+    description: 'Calculate simple or weighted average of percentages with ease. Perfect for academics, business, and research data.',
+    path: '/average-percentage-calculator'
+  },
 ];
 
 export default function SearchContent() {
