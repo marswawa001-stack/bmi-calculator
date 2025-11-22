@@ -50,7 +50,8 @@ export default function AnnealingCalculatorContent() {
     }
     if (unit === 'K') {
       // Celsius degree and Kelvin degree are same magnitude for differences
-      return `${deltaC.toFixed(decimals)}K`;
+      // Use same K formatting precision as absolute temperatures
+      return `${deltaC.toFixed(2)}K`;
     }
     if (unit === 'F') {
       const v = (deltaC * 9) / 5;
@@ -380,7 +381,7 @@ export default function AnnealingCalculatorContent() {
                 type="number"
                 value={tmPrimer}
                 onChange={(e) => handleInputChange(e, setTmPrimer)}
-                placeholder="Acceptable: 50-68°C"
+                placeholder={getRecommendedRangeLabel('primer', unitPrimer).acceptable}
                 className={`w-full px-4 py-3 pr-32 border-2 rounded-lg focus:outline-none text-lg text-gray-900 transition ${
                   primerValidation?.type === 'error' ? 'border-red-500 bg-red-50' :
                   primerValidation?.type === 'warning' ? 'border-orange-500 bg-orange-50' :
@@ -445,7 +446,7 @@ export default function AnnealingCalculatorContent() {
                 type="number"
                 value={tmProduct}
                 onChange={(e) => handleInputChange(e, setTmProduct)}
-                placeholder="Acceptable: 55-100°C"
+                placeholder={getRecommendedRangeLabel('product', unitProduct).acceptable}
                 className={`w-full px-4 py-3 pr-32 border-2 rounded-lg focus:outline-none text-lg text-gray-900 transition ${
                   productValidation?.type === 'error' ? 'border-red-500 bg-red-50' :
                   productValidation?.type === 'warning' ? 'border-orange-500 bg-orange-50' :
