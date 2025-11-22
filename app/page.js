@@ -12,7 +12,7 @@ export default function Home() {
     {
       id: 'biology',
       name: 'Biology',
-      count: 0,
+      count: 1,
       color: 'bg-teal-50 hover:bg-teal-100 border-teal-200',
       icon: (
         <svg className="w-12 h-12 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -189,6 +189,12 @@ export default function Home() {
       name: 'Test Grade Calculator', 
       categoryId: 'other',
       description: 'Calculate your test score and letter grade instantly. Supports custom grading scales.'
+    },
+    {
+      id: 'annealing-temperature-calculator',
+      name: 'Annealing Temperature Calculator',
+      categoryId: 'biology',
+      description: 'Estimate PCR primer annealing temperature (Ta) from primer and target melting temperatures (Tm).'
     },
   ];
 
@@ -451,6 +457,17 @@ export default function Home() {
               </h3>
               <p className="text-gray-600">
                 Calculate your test score and letter grade instantly with a standard grading scale.
+              </p>
+            </a>
+            <a
+              href="/annealing-temperature-calculator"
+              className="group bg-gradient-to-r from-teal-50 to-emerald-50 border-2 border-teal-200 rounded-xl p-6 hover:shadow-xl transition-all duration-300"
+            >
+              <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-teal-600">
+                Annealing Temperature Calculator
+              </h3>
+              <p className="text-gray-600">
+                Estimate PCR primer annealing temperature (Ta) from primer and target melting temperatures (Tm).
               </p>
             </a>
           </div>

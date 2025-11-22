@@ -33,6 +33,13 @@ const allCalculators = [
     description: 'Calculate your test score and letter grade with customizable grading scale',
     path: '/test-grade-calculator'
   },
+  {
+    id: 'annealing-temperature-calculator',
+    name: 'Annealing Temperature Calculator',
+    category: 'Biology',
+    description: 'Estimate PCR primer annealing temperature (Ta) from primer and target melting temperatures (Tm).',
+    path: '/annealing-temperature-calculator'
+  },
 ];
 
 export default function SearchContent() {

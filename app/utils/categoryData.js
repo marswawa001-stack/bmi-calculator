@@ -122,7 +122,16 @@ export const categoryData = {
     bgColor: 'bg-teal-50',
     borderColor: 'border-teal-200',
     iconBg: 'bg-teal-100',
-    calculators: []
+    calculators: [
+      {
+        id: 'annealing-temperature-calculator',
+        name: 'Annealing Temperature Calculator',
+        description: 'Estimate PCR primer annealing temperature (Ta) from primer and target melting temperatures (Tm). Supports °C / °F / K.',
+        icon: '🧪',
+        path: '/annealing-temperature-calculator',
+        popular: false
+      }
+    ]
   },
   construction: {
     name: 'Construction',

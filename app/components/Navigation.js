@@ -45,6 +45,12 @@ export default function Navigation() {
       category: 'Other',
       path: '/test-grade-calculator'
     },
+    {
+      id: 'annealing-temperature-calculator',
+      name: 'Annealing Temperature Calculator',
+      category: 'Biology',
+      path: '/annealing-temperature-calculator'
+    },
   ];
 
   const categories = [
