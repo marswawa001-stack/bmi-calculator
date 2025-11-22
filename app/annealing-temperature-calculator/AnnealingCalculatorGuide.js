@@ -28,7 +28,6 @@ export function AnnealingCalculatorGuide() {
             <li><strong>Enter Primer Tm:</strong> Input the melting temperature of the <em>less stable primer</em> (the lower Tm if you have two primers).</li>
             <li><strong>Enter Target Tm:</strong> Input the melting temperature of your target DNA template.</li>
             <li><strong>Get Instant Results:</strong> The calculator displays your optimal Ta immediately, along with a recommended experimental range and practical tips.</li>
-            <li><strong>Copy and Use:</strong> Click "Copy result" to save the recommended temperature to your clipboard for lab notes or experiment records.</li>
           </ol>
           <div className="bg-indigo-50 p-4 rounded-lg border-l-4 border-indigo-600 mt-4">
             <p className="text-sm font-semibold">💡 Pro Tip: Start with the recommended temperature and perform a gradient PCR (±1–3°C) to fine-tune for your specific reaction conditions.</p>
@@ -80,6 +79,26 @@ export function AnnealingCalculatorGuide() {
             <p className="font-semibold text-gray-800">Salt and Mg²⁺ Concentration</p>
             <p className="text-sm mt-1 text-gray-800">Higher salt and magnesium concentrations stabilize primer-template interactions, allowing lower annealing temperatures. If you're struggling with non-specific amplification, adjusting buffer composition can help more than temperature alone.</p>
           </div>
+        </div>
+      </div>
+
+      {/* Temperature Units and Difference (Δ) */}
+      <div className="bg-white rounded-2xl shadow-lg p-8">
+        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">ℹ️ Temperature Units &amp; Temperature Differences (Δ)</h2>
+        <div className="space-y-4 text-gray-700">
+          <p className="text-sm">
+            Important: converting a single temperature (an absolute value) between units is <strong>not</strong> the same as converting a temperature difference (Δ). For absolute temperatures, conversions require both a scale and an offset (for example, °F = °C × 9/5 + 32). For temperature differences (ΔT), you should only scale the magnitude (for example, Δ°F = Δ°C × 9/5; ΔK = Δ°C). In other words, a 10°C difference equals 10 K difference or 18°F difference, but 10°C as an absolute temperature equals 50°F.
+          </p>
+          <p className="text-sm">
+            Our calculator displays absolute temperatures (primer and product Tm) using proper absolute conversions, while any displayed differences (ΔTm) are converted using difference-aware rules (no added offsets). If you see both an absolute value and a difference in a message, they describe different concepts — the absolute temperature of each item and the temperature gap between them.
+          </p>
+          <p className="text-sm font-semibold">Example:</p>
+          <ul className="text-sm list-disc list-inside">
+            <li>Primer = 60°C → 140°F (absolute temperature)</li>
+            <li>Product = 70°C → 158°F (absolute temperature)</li>
+            <li>Difference ΔTm = 10°C → 10 K or 18°F (temperature difference)</li>
+          </ul>
+          <p className="text-xs text-gray-600">Tip: look for the Δ symbol or the word “difference” to know which conversion rule is being applied.</p>
         </div>
       </div>
 
